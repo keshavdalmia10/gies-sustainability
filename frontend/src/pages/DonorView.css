@@ -1,0 +1,199 @@
+.donor-view {
+  animation: fadeIn 0.5s ease-out;
+}
+
+.page-header {
+  text-align: center;
+  margin-bottom: var(--spacing-2xl);
+}
+
+.page-header h1 {
+  font-size: 2.5rem;
+  margin-bottom: var(--spacing-md);
+}
+
+.page-subtitle {
+  font-size: var(--font-size-lg);
+  color: var(--color-text-light);
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.filters {
+  margin-bottom: var(--spacing-xl);
+  padding: var(--spacing-lg);
+}
+
+.filters h3 {
+  margin-bottom: var(--spacing-md);
+  font-size: var(--font-size-lg);
+}
+
+.sdg-filters {
+  display: flex;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+}
+
+.impact-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: var(--spacing-xl);
+  margin-bottom: var(--spacing-2xl);
+}
+
+.impact-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.sdg-badge {
+  display: inline-block;
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  color: var(--color-text-dark);
+  margin-bottom: var(--spacing-sm);
+}
+
+.card-summary {
+  color: var(--color-text);
+  line-height: 1.6;
+  flex: 1;
+}
+
+.outcomes h4 {
+  font-size: var(--font-size-md);
+  margin-bottom: var(--spacing-sm);
+  color: var(--color-text-dark);
+}
+
+.outcomes-list {
+  list-style: none;
+  padding: 0;
+}
+
+.outcomes-list li {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-xs) 0;
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+}
+
+.metrics {
+  display: flex;
+  gap: var(--spacing-lg);
+  padding: var(--spacing-md) 0;
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.metric {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  flex: 1;
+}
+
+.metric-label {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.metric-value {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: var(--color-text-dark);
+}
+
+.metric-value.highlight {
+  color: var(--color-secondary);
+}
+
+.geography {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  color: var(--color-text-light);
+  font-size: var(--font-size-sm);
+}
+
+.card-actions {
+  display: flex;
+  gap: var(--spacing-md);
+  margin-top: auto;
+}
+
+.card-actions .btn {
+  flex: 1;
+}
+
+.summary-stats {
+  background: linear-gradient(135deg, rgba(0, 102, 204, 0.05) 0%, rgba(78, 205, 196, 0.05) 100%);
+  padding: var(--spacing-2xl);
+}
+
+.summary-stats h3 {
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing-xl);
+}
+
+.stat {
+  text-align: center;
+}
+
+.stat-value {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.stat-label {
+  font-size: var(--font-size-md);
+  color: var(--color-text-light);
+}
+
+.empty-state {
+  text-align: center;
+  padding: var(--spacing-2xl);
+}
+
+.empty-state code {
+  display: block;
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  font-family: 'Monaco', monospace;
+}
+
+.loading-state {
+  margin-top: var(--spacing-xl);
+}
+
+@media (max-width: 768px) {
+  .impact-cards-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .sdg-filters {
+    flex-direction: column;
+  }
+  
+  .card-actions {
+    flex-direction: column;
+  }
+}

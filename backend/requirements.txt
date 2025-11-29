@@ -1,0 +1,55 @@
+# FastAPI and server
+fastapi
+uvicorn[standard]
+python-multipart
+
+# Database
+psycopg2-binary
+sqlalchemy
+alembic
+
+# Async support
+asyncpg
+aiosqlite
+greenlet
+
+# Pydantic for validation
+pydantic
+pydantic-settings
+
+# Machine Learning & AI
+sentence-transformers
+openai
+numpy
+pandas
+scikit-learn
+
+# Vector databases
+pinecone-client
+faiss-cpu
+
+# Task queue
+celery
+redis
+
+# External API clients
+httpx
+
+# Web scraping
+beautifulsoup4
+lxml
+aiohttp
+
+# Utilities
+python-dotenv
+python-jose[cryptography]
+passlib[bcrypt]
+python-dateutil
+PyPDF2
+pdfplumber
+
+# Testing
+pytest
+pytest-asyncio
+pytest-cov
+httpx

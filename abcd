@@ -1,0 +1,43 @@
+Impact Linkage Engine — 'From Papers to Proof'
+Judge Evaluation Scores
+Innovation: 9.0
+Feasibility: 7.5
+Impact Alignment (SDGs / Research Mission): 9.0
+Clarity of Storytelling: 8.5
+Innovation
+What’s outstanding: Elevates the dashboard from descriptive analytics to evidence-level attribution
+(papers → jobs/policies/startups/clinics). Smart precision/recall mode and evidence drawer with
+confidence scores signal serious thinking about trust and UX. Bridges the “last mile” from research
+outputs to fundable narratives—rare and differentiating.
+What to sharpen: Define causal language guardrails and show 2–3 phrasing templates that avoid
+overclaiming. Add a “negative evidence” notion (why a candidate was rejected) to further strengthen
+credibility.
+Feasibility
+What’s strong: Realistic narrow-scope MVP (1 SDG, 2–3 exemplars). Uses proven building blocks:
+entity resolution + embeddings + rule features + human-in-the-loop. Clear data pathway via public
+feeds (NIH/NSF, USPTO, state registries, agency PDFs).
+What to mitigate: Clarify source access & rate limits. Show a ground-truthing plan (10–20
+hand-validated linkages) and target Precision@k ≥ 0.85. Add a lightweight governance & data retention
+note.
+Impact Alignment
+What’s strong: Directly advances institutional priorities: transparent, measurable societal impact
+mapped to SDGs. Benefits multiple stakeholders: Leadership, Donors, Researchers.
+What to deepen: Include place-based metrics for SDGs with local relevance. Add an equity lens (e.g.,
+outcomes in underserved communities) to strengthen mission fit.
+Clarity of Storytelling
+What’s compelling: “From Papers to Proof” is memorable; the 5-minute demo storyboard is crisp and
+visual. The Impact Card metaphor is intuitive, portable to slides, PDFs, and web.
+What to polish: Open with one named example to humanize the story. Tighten the ask: “Pilot SDG7,
+10 validated cards, Precision@5 ≥ 0.85, 2 donor briefings.”
+Overall Verdict
+Finalist-level concept with a credible MVP and clear institutional value. Nail precision, governance, and
+one unforgettable end-to-end example, and this becomes a category-defining entry.
+100-Word Vision Statement
+Illinois creates world-class sustainability research, but impact remains hidden in PDFs and scattered
+databases. The Impact Linkage Engine turns papers into verifiable proof: evidence-backed cards that
+link research to jobs, policies, startups, and healthier communities—each with citations, confidence,
+and transparent reasoning. With a precision-first pipeline and human-in-the-loop review, we make
+impact measurable, trustable, and fundable. Leaders see portfolio strengths and gaps; donors see
+stories they can invest in; researchers discover pathways to translation and collaboration. Starting with
+one SDG, we will build an expandable, open framework that shows what Illinois research does—not
+just what it publishes, for Illinois and beyond.
