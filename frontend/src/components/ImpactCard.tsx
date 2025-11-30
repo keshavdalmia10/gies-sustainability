@@ -1,5 +1,7 @@
-import { User, TrendingUp } from 'lucide-react';
+import { User, TrendingUp, Check, X, Shield } from 'lucide-react';
 import EvidenceDrawer from './EvidenceDrawer';
+import { useImpactDetective } from '../hooks/useImpactDetective';
+import { useState } from 'react';
 
 interface ImpactCardProps {
   faculty: {
@@ -28,6 +30,15 @@ interface ImpactCardProps {
 
 export default function ImpactCard({ faculty, sdg, narrative, keyOutcomes, metrics, evidence }: ImpactCardProps) {
   const sdgColor = sdg.color || `var(--sdg-${sdg.number}, #0066cc)`;
+  const { validateCard } = useImpactDetective();
+  const [hasValidated, setHasValidated] = useState(false);
+
+  const handleValidation = (status: 'approved' | 'rejected') => {
+    if (hasValidated) return;
+    // TODO: Pass actual card ID when available from props
+    validateCard(status, '00000000-0000-0000-0000-000000000000'); 
+    setHasValidated(true);
+  };
 
   return (
     <div className="card" style={{ maxWidth: '800px', margin: '0 auto', borderTop: `6px solid ${sdgColor}` }}>
@@ -117,6 +128,39 @@ export default function ImpactCard({ faculty, sdg, narrative, keyOutcomes, metri
         grants={evidence.grants}
         patents={evidence.patents}
       />
+
+      {/* Validation Section (Impact Detective) */}
+      <div style={{ marginTop: 'var(--spacing-xl)', paddingTop: 'var(--spacing-lg)', borderTop: '1px solid var(--color-border)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Shield size={20} color="var(--color-text-light)" />
+            <span style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-light)', fontWeight: 600 }}>IMPACT DETECTIVE</span>
+          </div>
+          
+          {!hasValidated ? (
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button 
+                onClick={() => handleValidation('rejected')}
+                className="btn btn-outline" 
+                style={{ borderColor: 'var(--color-error)', color: 'var(--color-error)', padding: '6px 12px', fontSize: '14px' }}
+              >
+                <X size={16} style={{ marginRight: '4px' }} /> Reject
+              </button>
+              <button 
+                onClick={() => handleValidation('approved')}
+                className="btn" 
+                style={{ backgroundColor: 'var(--color-success)', color: '#fff', padding: '6px 12px', fontSize: '14px', border: 'none' }}
+              >
+                <Check size={16} style={{ marginRight: '4px' }} /> Approve
+              </button>
+            </div>
+          ) : (
+             <div style={{ color: 'var(--color-success)', fontWeight: 600, fontSize: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+               <Check size={18} /> Validated
+             </div>
+          )}
+        </div>
+      </div>
 
     </div>
   );

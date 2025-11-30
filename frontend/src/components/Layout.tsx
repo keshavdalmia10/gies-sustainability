@@ -1,5 +1,7 @@
 import { ReactNode } from 'react'
 import { Link, useLocation } from 'react-router-dom'
+import { Award, CheckCircle } from 'lucide-react'
+import { useImpactDetective } from '../hooks/useImpactDetective'
 import './Layout.css'
 
 interface LayoutProps {
@@ -8,6 +10,7 @@ interface LayoutProps {
 
 export default function Layout({ children }: LayoutProps) {
   const location = useLocation()
+  const { validationCount, showToast, lastAction } = useImpactDetective()
   
   const isActive = (path: string) => location.pathname === path
   
@@ -33,6 +36,12 @@ export default function Layout({ children }: LayoutProps) {
             <Link to="/student" className={isActive('/student') ? 'nav-link active' : 'nav-link'}>
               Student View
             </Link>
+            
+            {/* Impact Detective Badge */}
+            <div className="nav-link" style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--color-primary)', fontWeight: 600, cursor: 'default' }}>
+              <Award size={18} />
+              <span>{validationCount}</span>
+            </div>
           </nav>
         </div>
       </header>
@@ -40,6 +49,35 @@ export default function Layout({ children }: LayoutProps) {
       <main className="main-content">
         {children}
       </main>
+      
+      {/* Toast Notification */}
+      {showToast && (
+        <div style={{
+          position: 'fixed',
+          bottom: '24px',
+          right: '24px',
+          backgroundColor: '#fff',
+          padding: '16px 24px',
+          borderRadius: '8px',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+          zIndex: 1000,
+          animation: 'slideUp 0.3s ease-out',
+          borderLeft: '4px solid var(--color-success)'
+        }}>
+          <CheckCircle size={24} color="var(--color-success)" />
+          <div>
+            <div style={{ fontWeight: 600, fontSize: '14px' }}>
+              {lastAction === 'approved' ? 'Impact Verified!' : 'Feedback Recorded'}
+            </div>
+            <div style={{ fontSize: '12px', color: 'var(--color-text-light)' }}>
+              You just strengthened our impact story! ({validationCount} total)
+            </div>
+          </div>
+        </div>
+      )}
       
       <footer className="footer">
         <div className="container footer-content">

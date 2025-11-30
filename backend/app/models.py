@@ -270,3 +270,13 @@ class SDGGoal(Base):
     color_hex = Column(String(7))
     icon_url = Column(Text)
     keywords = Column(ARRAY(Text))
+
+
+class ImpactValidation(Base):
+    __tablename__ = "impact_validations"
+    
+    validation_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    card_id = Column(UUID(as_uuid=True), ForeignKey("impact_cards.card_id", ondelete="CASCADE"))
+    visitor_id = Column(String(255))  # Anonymous tracking ID
+    status = Column(String(50), nullable=False)  # 'approved', 'rejected'
+    timestamp = Column(DateTime, server_default=func.now())

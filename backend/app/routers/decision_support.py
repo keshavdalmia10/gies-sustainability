@@ -10,7 +10,7 @@ from decimal import Decimal
 from app.database import get_db
 from app.models import (
     Faculty, Publication, ImpactCard as ImpactCardModel,
-    Impact, Grant, Patent, SDGGoal
+    Impact, Grant, Patent, SDGGoal, ImpactValidation
 )
 from app.schemas import DecisionSupportData, DonorViewData, DashboardStats
 
@@ -178,6 +178,19 @@ async def dashboard_stats(
     )
     by_sdg = {row[0]: {"count": row[1]} for row in by_sdg_result if row[0]}
     
+    # Count validations
+    validation_count = await db.execute(
+        select(func.count(ImpactValidation.validation_id))
+    )
+    total_validations = validation_count.scalar() or 0
+    
+    # Calculate approval rate
+    approval_count = await db.execute(
+        select(func.count(ImpactValidation.validation_id)).where(ImpactValidation.status == 'approved')
+    )
+    approved_validations = approval_count.scalar() or 0
+    approval_rate = (approved_validations / total_validations * 100) if total_validations > 0 else 0
+
     return {
         "total_faculty": total_faculty,
         "total_publications": total_pubs,
@@ -186,7 +199,9 @@ async def dashboard_stats(
         "total_patents": total_patents,
         "total_impact_cards": total_cards,
         "by_sdg": by_sdg,
-        "sustainability_percentage": (sustainable_pubs / total_pubs * 100) if total_pubs > 0 else 0
+        "sustainability_percentage": (sustainable_pubs / total_pubs * 100) if total_pubs > 0 else 0,
+        "community_validations": total_validations,
+        "community_approval_rate": approval_rate
     }
 
 

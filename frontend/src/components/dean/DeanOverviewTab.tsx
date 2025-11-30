@@ -5,7 +5,7 @@ export default function DeanOverviewTab() {
   return (
     <div>
       {/* KPI Grid */}
-      <div className="grid grid-3 mb-4">
+      <div className="grid grid-4 mb-4">
         <div className="card" style={{ padding: 'var(--spacing-lg)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
             <div style={{ padding: '8px', borderRadius: '8px', backgroundColor: 'rgba(46, 204, 113, 0.1)', color: 'var(--color-success)' }}>
@@ -37,6 +37,17 @@ export default function DeanOverviewTab() {
           </div>
           <div style={{ fontSize: 'var(--font-size-2xl)', fontWeight: 700, marginBottom: '4px' }}>711</div>
           <div className="text-muted">19% of Total Research</div>
+        </div>
+
+        <div className="card" style={{ padding: 'var(--spacing-lg)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+            <div style={{ padding: '8px', borderRadius: '8px', backgroundColor: 'rgba(241, 196, 15, 0.1)', color: '#f1c40f' }}>
+              <Target size={24} />
+            </div>
+            <div style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-light)', fontWeight: 600 }}>COMMUNITY CONFIDENCE</div>
+          </div>
+          <div style={{ fontSize: 'var(--font-size-2xl)', fontWeight: 700, marginBottom: '4px' }}>98%</div>
+          <div className="text-muted">Based on 42 validations</div>
         </div>
       </div>
 

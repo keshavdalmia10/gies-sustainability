@@ -8,11 +8,13 @@ from typing import List, Optional
 from uuid import UUID
 
 from app.database import get_db
-from app.models import ImpactCard as ImpactCardModel, Faculty, SDGGoal
+from app.models import ImpactCard as ImpactCardModel, Faculty, SDGGoal, Impact
 from app.schemas import (
     ImpactCard, ImpactCardCreate, ImpactCardUpdate, 
-    ImpactCardDetailed, ImpactCardFilter
+    ImpactCardDetailed, ImpactCardFilter,
+    ImpactValidationCreate, ImpactValidationResponse
 )
+from app.models import ImpactValidation
 
 router = APIRouter()
 
@@ -72,18 +74,25 @@ async def get_impact_card(
     )
     sdg = sdg_result.scalar_one()
     
-    # Build detailed response
-    card_dict = {
-        **card.__dict__,
-        "faculty_name": faculty.name,
-        "faculty_department": faculty.department,
-        "sdg_title": sdg.title,
-        "sdg_color": sdg.color_hex,
-        "publication_details": [],  # TODO: Fetch actual publications
-        "impact_details": []  # TODO: Fetch actual impacts
-    }
+    # Get impacts
+    impacts_result = await db.execute(
+        select(Impact).where(Impact.impact_id.in_(card.impacts))
+    )
+    impacts = impacts_result.scalars().all()
     
-    return card_dict
+    # Build detailed response
+    # TODO: Fetch actual publications
+    publications = [] 
+    
+    return ImpactCardDetailed(
+        **card.__dict__,
+        faculty_name=faculty.name,
+        faculty_department=faculty.department,
+        sdg_title=sdg.title,
+        sdg_color=sdg.color_hex,
+        publication_details=publications,
+        impact_details=impacts
+    )
 
 
 @router.post("/", response_model=ImpactCard, status_code=201)

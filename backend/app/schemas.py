@@ -374,3 +374,18 @@ class DonorViewData(BaseModel):
     total_funding_opportunities: Decimal
     communities_reached: int
     sdg_breakdown: Dict[int, int]
+
+
+class ImpactValidationCreate(BaseModel):
+    visitor_id: str
+    status: str = Field(..., pattern="^(approved|rejected)$")
+
+
+class ImpactValidationResponse(BaseModel):
+    validation_id: UUID
+    card_id: UUID
+    status: str
+    timestamp: datetime
+    
+    class Config:
+        from_attributes = True
