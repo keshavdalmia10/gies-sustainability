@@ -53,3 +53,7 @@ pytest
 pytest-asyncio
 pytest-cov
 httpx
+networkx
+langchain
+langchain-openai
+langgraph

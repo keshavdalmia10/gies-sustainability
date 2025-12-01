@@ -36,6 +36,9 @@ export default function Layout({ children }: LayoutProps) {
             <Link to="/student" className={isActive('/student') ? 'nav-link active' : 'nav-link'}>
               Student View
             </Link>
+            <Link to="/networking" className={isActive('/networking') ? 'nav-link active' : 'nav-link'}>
+              Networking
+            </Link>
             
             {/* Impact Detective Badge */}
             <div className="nav-link" style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--color-primary)', fontWeight: 600, cursor: 'default' }}>

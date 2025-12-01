@@ -8,7 +8,7 @@ import os
 from dotenv import load_dotenv
 
 from app.database import init_db, close_db
-from app.routers import faculty, publications, impacts, impact_cards, evaluation, feedback, decision_support, ml, card_generator, extended_data, data_sources, verification
+from app.routers import faculty, publications, impacts, impact_cards, evaluation, feedback, decision_support, ml, card_generator, extended_data, data_sources, verification, networking
 
 load_dotenv()
 
@@ -53,6 +53,7 @@ app.include_router(card_generator.router, prefix="/api/v1/card-generator", tags=
 app.include_router(extended_data.router, prefix="/api/v1/extended", tags=["Extended Data"])
 app.include_router(data_sources.router, prefix="/api/v1/data-sources", tags=["Data Sources"])
 app.include_router(verification.router, prefix="/api/v1/verification", tags=["Faculty Verification"])
+app.include_router(networking.router, prefix="/api/v1/networking", tags=["Networking"])
 
 
 @app.get("/")

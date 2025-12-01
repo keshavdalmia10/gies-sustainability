@@ -35,6 +35,10 @@ class Faculty(Base):
     courses = relationship("CourseCurriculum", back_populates="instructor")
     advised_projects = relationship("StudentProject", back_populates="advisor")
     partnerships = relationship("CorporatePartnership", back_populates="faculty_lead")
+    
+    # Networking relationships
+    skills = relationship("Skill", secondary="faculty_skills", back_populates="faculty")
+    interests = relationship("Interest", secondary="faculty_interests", back_populates="faculty")
 
 
 class Publication(Base):
