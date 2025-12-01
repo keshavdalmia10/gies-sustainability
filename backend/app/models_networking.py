@@ -41,6 +41,7 @@ class Student(Base):
     major = Column(String(255))
     year = Column(String(50)) # Freshman, Sophomore, etc.
     bio = Column(Text)
+    impact_points = Column(Integer, default=0)
     
     # Relationships
     skills = relationship("Skill", secondary=student_skills, back_populates="students")

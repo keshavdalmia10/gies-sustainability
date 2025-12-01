@@ -98,33 +98,40 @@ async def retrieve_nodes(state: AgentState, db: AsyncSession):
         matches = result.scalars().all()
         found_skills.extend(matches)
         
-    # Collect people
-    seen_ids = set()
+    # Collect people and aggregate their matched skills
+    people_map = {} # ID -> {node_data, matched_skills: set()}
     
     for skill in found_skills:
         for s in skill.students:
-            if str(s.student_id) not in seen_ids:
-                relevant_nodes.append({
-                    "id": str(s.student_id),
+            s_id = str(s.student_id)
+            if s_id not in people_map:
+                people_map[s_id] = {
+                    "id": s_id,
                     "label": s.name,
                     "type": "student",
-                    "skills": [sk.name for sk in s.skills],
-                    "matched_skill": skill.name,
+                    "all_skills": [sk.name for sk in s.skills], # All skills they have
+                    "matched_skills": set(), # Skills relevant to query
                     "group": 1
-                })
-                seen_ids.add(str(s.student_id))
+                }
+            people_map[s_id]["matched_skills"].add(skill.name)
                 
         for f in skill.faculty:
-            if str(f.person_uuid) not in seen_ids:
-                relevant_nodes.append({
-                    "id": str(f.person_uuid),
+            f_id = str(f.person_uuid)
+            if f_id not in people_map:
+                people_map[f_id] = {
+                    "id": f_id,
                     "label": f.name,
                     "type": "faculty",
-                    "skills": [sk.name for sk in f.skills],
-                    "matched_skill": skill.name,
+                    "all_skills": [sk.name for sk in f.skills],
+                    "matched_skills": set(),
                     "group": 2
-                })
-                seen_ids.add(str(f.person_uuid))
+                }
+            people_map[f_id]["matched_skills"].add(skill.name)
+    
+    # Convert to list
+    for p in people_map.values():
+        p["matched_skills"] = list(p["matched_skills"]) # Convert set to list
+        relevant_nodes.append(p)
                 
     return {"relevant_nodes": relevant_nodes}
 
@@ -146,31 +153,33 @@ def construct_graph(state: AgentState):
     
     # Add Skill Nodes
     skill_map = {}
+    
     for node in nodes:
-        matched_skill = node["matched_skill"]
-        if matched_skill not in skill_map:
-            skill_id = f"skill_{matched_skill}"
-            skill_map[matched_skill] = skill_id
-            graph_nodes.append({
-                "id": skill_id,
-                "label": matched_skill,
-                "type": "skill",
-                "group": 3
-            })
-            
         # Add Person Node
         graph_nodes.append({
             "id": node["id"],
             "label": node["label"],
             "type": node["type"],
-            "group": 1 if node["type"] == "student" else 2
+            "group": node["group"]
         })
         
-        # Add Edge
-        graph_edges.append({
-            "source": node["id"],
-            "target": skill_map[matched_skill]
-        })
+        # Add Edges to ALL matched skills
+        for skill_name in node["matched_skills"]:
+            if skill_name not in skill_map:
+                skill_id = f"skill_{skill_name}"
+                skill_map[skill_name] = skill_id
+                graph_nodes.append({
+                    "id": skill_id,
+                    "label": skill_name,
+                    "type": "skill",
+                    "group": 3
+                })
+            
+            # Add Edge
+            graph_edges.append({
+                "source": node["id"],
+                "target": skill_map[skill_name]
+            })
         
     return {"graph_data": {"nodes": graph_nodes, "edges": graph_edges}}
 
@@ -184,7 +193,7 @@ async def generate_advice(state: AgentState):
     if not nodes:
         return {"final_response": "I couldn't find anyone with the exact skills for your request. Try broadening your search or adding more specific skills to the database."}
     
-    node_summaries = "\n".join([f"- {n['label']} ({n['type']}): Matches '{n['matched_skill']}'" for n in nodes[:10]])
+    node_summaries = "\n".join([f"- {n['label']} ({n['type']}): Matches {', '.join(n['matched_skills'])}" for n in nodes[:10]])
     
     system_prompt = """You are a helpful networking advisor. 
     The user wants to achieve a goal, and we have found some relevant people.

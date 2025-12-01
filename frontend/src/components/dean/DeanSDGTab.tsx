@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import SDGHeatmap from '../SDGHeatmap';
+import { SDGDistributionChart, SDGData } from '../AnalyticsCharts';
 import { 
   Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Tooltip 
 } from 'recharts';
@@ -15,8 +16,31 @@ const RADAR_DATA = [
 ];
 
 export default function DeanSDGTab() {
+  const [sdgData, setSdgData] = useState<SDGData[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await fetch('http://localhost:8000/api/v1/analytics/sdg/distribution');
+        const json = await res.json();
+        setSdgData(json);
+      } catch (error) {
+        console.error("Failed to fetch SDG data", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   return (
     <div>
+      {/* UN SDG Distribution Chart */}
+      <div className="card mb-4">
+        <h3 className="card-title">UN Sustainable Development Goals Distribution</h3>
+        <p className="card-subtitle mb-3">Total mentions of each UN SDG across all articles</p>
+        <SDGDistributionChart data={sdgData} />
+      </div>
+
       <div className="grid grid-2 mb-4">
         {/* Radar Chart - Portfolio Balance */}
         <div className="card">

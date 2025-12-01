@@ -6,12 +6,14 @@ const VALIDATION_EVENT = 'impact-validated';
 interface ValidationEventDetail {
   count: number;
   status: 'approved' | 'rejected';
+  points?: number;
 }
 
 export function useImpactDetective() {
   const [validationCount, setValidationCount] = useState(0);
   const [showToast, setShowToast] = useState(false);
   const [lastAction, setLastAction] = useState<'approved' | 'rejected' | null>(null);
+  const [pointsEarned, setPointsEarned] = useState(0);
 
   // Load initial count from localStorage
   useEffect(() => {
@@ -27,6 +29,7 @@ export function useImpactDetective() {
       const customEvent = event as CustomEvent<ValidationEventDetail>;
       setValidationCount(customEvent.detail.count);
       setLastAction(customEvent.detail.status);
+      setPointsEarned(customEvent.detail.points || 0);
       
       // Show toast
       setShowToast(true);
@@ -58,7 +61,7 @@ export function useImpactDetective() {
           localStorage.setItem('visitor_id', visitorId);
         }
 
-        await fetch(`http://localhost:8000/api/impact-cards/${cardId}/validate`, {
+        const response = await fetch(`http://localhost:8000/api/v1/impact-cards/${cardId}/validate`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -68,6 +71,18 @@ export function useImpactDetective() {
             status: status
           }),
         });
+        
+        if (response.ok) {
+          const data = await response.json();
+          if (data.points_awarded > 0) {
+            // Dispatch event with points
+            const event = new CustomEvent<ValidationEventDetail>(VALIDATION_EVENT, {
+              detail: { count: newCount, status, points: data.points_awarded }
+            });
+            window.dispatchEvent(event);
+            return; // Exit early as we dispatched a new event
+          }
+        }
       } catch (error) {
         console.error('Failed to record validation:', error);
       }
@@ -78,6 +93,7 @@ export function useImpactDetective() {
     validationCount,
     showToast,
     lastAction,
+    pointsEarned,
     validateCard
   };
 }

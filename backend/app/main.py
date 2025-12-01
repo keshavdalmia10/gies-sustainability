@@ -8,7 +8,11 @@ import os
 from dotenv import load_dotenv
 
 from app.database import init_db, close_db
-from app.routers import faculty, publications, impacts, impact_cards, evaluation, feedback, decision_support, ml, card_generator, extended_data, data_sources, verification, networking
+# Import models to ensure they are registered
+from app import models
+from app import models_extended
+from app import models_networking
+from app.routers import faculty, publications, impacts, impact_cards, evaluation, feedback, decision_support, ml, card_generator, extended_data, data_sources, verification, networking, news, analytics, gamification, donors
 
 load_dotenv()
 
@@ -54,6 +58,10 @@ app.include_router(extended_data.router, prefix="/api/v1/extended", tags=["Exten
 app.include_router(data_sources.router, prefix="/api/v1/data-sources", tags=["Data Sources"])
 app.include_router(verification.router, prefix="/api/v1/verification", tags=["Faculty Verification"])
 app.include_router(networking.router, prefix="/api/v1/networking", tags=["Networking"])
+app.include_router(news.router, prefix="/api/v1/news", tags=["News"])
+app.include_router(analytics.router, prefix="/api/v1/analytics", tags=["Analytics"])
+app.include_router(gamification.router, prefix="/api/v1/gamification", tags=["Gamification"])
+app.include_router(donors.router, prefix="/api/v1/donors", tags=["Donors"])
 
 
 @app.get("/")

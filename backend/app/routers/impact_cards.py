@@ -15,6 +15,7 @@ from app.schemas import (
     ImpactValidationCreate, ImpactValidationResponse
 )
 from app.models import ImpactValidation
+from app.models_networking import Student
 
 router = APIRouter()
 
@@ -182,3 +183,51 @@ async def publish_impact_card(
     await db.refresh(db_card)
     
     return {"message": "Impact card published successfully", "card_id": str(card_id)}
+
+
+@router.post("/{card_id}/validate")
+async def validate_impact_card(
+    card_id: UUID,
+    validation: ImpactValidationCreate,
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Validate an impact card and award points
+    """
+    # Check if card exists
+    result = await db.execute(
+        select(ImpactCardModel).where(ImpactCardModel.card_id == card_id)
+    )
+    db_card = result.scalar_one_or_none()
+    
+    if not db_card:
+        raise HTTPException(status_code=404, detail="Impact card not found")
+        
+    # Create validation record
+    db_validation = ImpactValidation(
+        card_id=card_id,
+        visitor_id=validation.visitor_id,
+        status=validation.status
+    )
+    db.add(db_validation)
+    
+    # Award points to student if visitor_id matches a student
+    # For MVP, we'll try to find a student with this ID (assuming visitor_id might be a student_id)
+    try:
+        student_uuid = UUID(validation.visitor_id)
+        student_result = await db.execute(
+            select(Student).where(Student.student_id == student_uuid)
+        )
+        student = student_result.scalar_one_or_none()
+        
+        if student and validation.status == 'approved':
+            student.impact_points = (student.impact_points or 0) + 10
+            db.add(student)
+    except ValueError:
+        # visitor_id is not a UUID, so it's likely an anonymous ID
+        pass
+    
+    await db.commit()
+    
+    return {"message": "Validation recorded", "points_awarded": 10 if validation.status == 'approved' else 0}
+

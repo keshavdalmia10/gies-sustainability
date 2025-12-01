@@ -23,6 +23,7 @@ class Faculty(Base):
     profile_url = Column(Text)
     photo_url = Column(Text)
     research_interests = Column(ARRAY(Text))
+    current_work = Column(Text)  # New field for "What I'm working on now"
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
     

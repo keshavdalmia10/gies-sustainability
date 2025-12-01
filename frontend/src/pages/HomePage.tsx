@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { Users, DollarSign, GraduationCap } from 'lucide-react'
 import './HomePage.css'
+import NewsFeed from '../components/news/NewsFeed'
 
 export default function HomePage() {
   return (
@@ -103,6 +104,11 @@ export default function HomePage() {
             find mentors working on sustainability challenges that matter.
           </p>
         </div>
+      </section>
+
+      {/* News Section */}
+      <section className="news-section container mt-12 mb-12">
+        <NewsFeed />
       </section>
     </div>
   )

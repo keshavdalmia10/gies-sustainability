@@ -20,6 +20,7 @@ class FacultyBase(BaseModel):
     profile_url: Optional[str] = None
     photo_url: Optional[str] = None
     research_interests: Optional[List[str]] = []
+    current_work: Optional[str] = None
 
 
 class FacultyCreate(FacultyBase):
@@ -34,6 +35,7 @@ class FacultyUpdate(BaseModel):
     profile_url: Optional[str] = None
     photo_url: Optional[str] = None
     research_interests: Optional[List[str]] = None
+    current_work: Optional[str] = None
 
 
 class Faculty(FacultyBase):
