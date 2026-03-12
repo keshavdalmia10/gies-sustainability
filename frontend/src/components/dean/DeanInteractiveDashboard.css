@@ -1,0 +1,344 @@
+.dean-dashboard-shell {
+  --dean-ink: #0f172a;
+  --dean-muted: #5b6472;
+  --dean-line: rgba(15, 23, 42, 0.1);
+  --dean-surface: rgba(255, 255, 255, 0.92);
+  --dean-surface-strong: #ffffff;
+  --dean-wash: linear-gradient(180deg, #f3f8ff 0%, #eef7f1 100%);
+  min-height: 100%;
+  padding: 32px;
+  background:
+    radial-gradient(circle at top right, rgba(31, 111, 235, 0.16), transparent 34%),
+    radial-gradient(circle at left center, rgba(47, 133, 90, 0.16), transparent 30%),
+    var(--dean-wash);
+  color: var(--dean-ink);
+}
+
+.dean-dashboard-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(300px, 1fr);
+  gap: 24px;
+  align-items: start;
+  margin-bottom: 24px;
+}
+
+.dean-eyebrow,
+.dean-card-kicker {
+  margin: 0 0 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #1f6feb;
+}
+
+.dean-dashboard-hero h1 {
+  margin: 0;
+  max-width: 14ch;
+  font-size: clamp(2rem, 4vw, 3.6rem);
+  line-height: 0.94;
+}
+
+.dean-hero-copy {
+  max-width: 60ch;
+  margin: 16px 0 0;
+  color: var(--dean-muted);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.dean-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.dean-kpi-card,
+.dean-story-card,
+.dean-chart-card,
+.dean-state-panel,
+.dean-filter-bar {
+  border: 1px solid var(--dean-line);
+  border-radius: 24px;
+  background: var(--dean-surface);
+  box-shadow: 0 18px 48px rgba(15, 23, 42, 0.06);
+  backdrop-filter: blur(12px);
+}
+
+.dean-kpi-card {
+  padding: 18px 20px;
+}
+
+.dean-kpi-card span {
+  display: block;
+  margin-bottom: 10px;
+  color: var(--dean-muted);
+}
+
+.dean-kpi-card strong {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.dean-filter-bar {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr)) auto;
+  gap: 14px;
+  padding: 18px;
+  margin-bottom: 24px;
+}
+
+.dean-filter-bar label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: var(--dean-muted);
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.dean-filter-bar select,
+.dean-filter-bar input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.96);
+  color: var(--dean-ink);
+}
+
+.dean-reset-button {
+  align-self: end;
+  height: 48px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 14px;
+  background: #0f172a;
+  color: #ffffff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.dean-story-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.dean-story-card {
+  padding: 20px;
+}
+
+.dean-story-card span {
+  display: block;
+  margin-bottom: 10px;
+  color: #1f6feb;
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.dean-story-card strong {
+  display: block;
+  margin-bottom: 12px;
+  font-size: 1.1rem;
+  line-height: 1.35;
+}
+
+.dean-story-card p {
+  margin: 0;
+  color: var(--dean-muted);
+  line-height: 1.5;
+}
+
+.dean-state-panel {
+  padding: 18px 20px;
+  margin-bottom: 20px;
+}
+
+.dean-error-panel {
+  border-color: rgba(185, 28, 28, 0.2);
+  color: #991b1b;
+}
+
+.dean-chart-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.dean-chart-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 360px;
+  padding: 20px;
+}
+
+.dean-chart-card-wide,
+.dean-chart-card-tall {
+  grid-column: 1 / -1;
+}
+
+.dean-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.dean-card-header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.dean-chart-frame {
+  flex: 1;
+  min-height: 280px;
+}
+
+.dean-heatmap-shell {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(280px, 0.9fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.dean-heatmap-grid {
+  display: grid;
+  gap: 10px;
+  align-items: stretch;
+}
+
+.dean-heatmap-corner,
+.dean-heatmap-column-header {
+  padding: 10px 8px;
+  color: var(--dean-muted);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.dean-heatmap-row-label {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  padding: 14px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 18px;
+  background: var(--dean-surface-strong);
+  text-align: left;
+  cursor: pointer;
+}
+
+.dean-heatmap-row-label.is-active {
+  border-color: rgba(31, 111, 235, 0.3);
+  box-shadow: inset 0 0 0 1px rgba(31, 111, 235, 0.24);
+}
+
+.dean-heatmap-row-label span {
+  font-weight: 700;
+}
+
+.dean-heatmap-row-label small {
+  color: var(--dean-muted);
+}
+
+.dean-heatmap-cell {
+  min-height: 72px;
+  border: 0;
+  border-radius: 18px;
+  color: #ffffff;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 140ms ease, box-shadow 140ms ease;
+}
+
+.dean-heatmap-cell:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.14);
+}
+
+.dean-heatmap-cell.is-empty {
+  background: rgba(15, 23, 42, 0.06) !important;
+  color: var(--dean-muted);
+}
+
+.dean-detail-panel {
+  position: sticky;
+  top: 16px;
+  padding: 18px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 20px;
+  background: var(--dean-surface-strong);
+}
+
+.dean-detail-panel h3 {
+  margin: 0 0 12px;
+  font-size: 1.15rem;
+}
+
+.dean-detail-panel p {
+  margin: 0;
+  color: var(--dean-muted);
+  line-height: 1.55;
+}
+
+.dean-paper-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.dean-paper-chip {
+  padding: 10px 12px;
+  border-radius: 999px;
+  background: rgba(31, 111, 235, 0.08);
+  color: #0f172a;
+  font-size: 0.9rem;
+}
+
+.dean-detail-fallback {
+  margin-top: 18px;
+  padding: 14px;
+  border-radius: 16px;
+  background: rgba(15, 23, 42, 0.04);
+}
+
+.dean-detail-fallback strong {
+  display: block;
+  margin-bottom: 8px;
+}
+
+@media (max-width: 1120px) {
+  .dean-dashboard-hero,
+  .dean-story-strip,
+  .dean-chart-grid,
+  .dean-heatmap-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .dean-filter-bar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .dean-dashboard-shell {
+    padding: 20px;
+  }
+
+  .dean-filter-bar {
+    grid-template-columns: 1fr;
+  }
+
+  .dean-kpi-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .dean-heatmap-grid {
+    overflow-x: auto;
+  }
+}

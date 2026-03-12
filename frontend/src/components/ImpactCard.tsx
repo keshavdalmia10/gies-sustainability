@@ -1,167 +1,139 @@
-import { User, TrendingUp, Check, X, Shield } from 'lucide-react';
-import EvidenceDrawer from './EvidenceDrawer';
-import { useImpactDetective } from '../hooks/useImpactDetective';
-import { useState } from 'react';
+import { useState, type CSSProperties } from 'react'
+import { User, TrendingUp, Check, X, Shield } from 'lucide-react'
+import EvidenceDrawer from './EvidenceDrawer'
+import { useImpactDetective } from '../hooks/useImpactDetective'
+import './ImpactCard.css'
 
 interface ImpactCardProps {
   faculty: {
-    name: string;
-    department: string;
-    imageUrl?: string;
-  };
+    name: string
+    department: string
+    imageUrl?: string
+  }
   sdg: {
-    number: number;
-    title: string;
-    color?: string;
-  };
-  narrative: string;
-  keyOutcomes: string[];
+    number: number
+    title: string
+    color?: string
+  }
+  narrative: string
+  keyOutcomes: string[]
   metrics: {
-    totalFunding: number;
-    communitiesReached: number;
-    fundingGap: number;
-  };
+    totalFunding: number
+    communitiesReached: number
+    fundingGap: number
+  }
   evidence: {
-    publications: any[];
-    grants: any[];
-    patents: any[];
-  };
+    publications: any[]
+    grants: any[]
+    patents: any[]
+  }
 }
 
-export default function ImpactCard({ faculty, sdg, narrative, keyOutcomes, metrics, evidence }: ImpactCardProps) {
-  const sdgColor = sdg.color || `var(--sdg-${sdg.number}, #0066cc)`;
-  const { validateCard } = useImpactDetective();
-  const [hasValidated, setHasValidated] = useState(false);
+export default function ImpactCard({
+  faculty,
+  sdg,
+  narrative,
+  keyOutcomes,
+  metrics,
+  evidence,
+}: ImpactCardProps) {
+  const sdgColor = sdg.color || `var(--sdg-${sdg.number}, #0f766e)`
+  const { validateCard } = useImpactDetective()
+  const [hasValidated, setHasValidated] = useState(false)
 
   const handleValidation = (status: 'approved' | 'rejected') => {
-    if (hasValidated) return;
-    // TODO: Pass actual card ID when available from props
-    validateCard(status, '00000000-0000-0000-0000-000000000000'); 
-    setHasValidated(true);
-  };
+    if (hasValidated) return
+    validateCard(status, '00000000-0000-0000-0000-000000000000')
+    setHasValidated(true)
+  }
 
   return (
-    <div className="card" style={{ maxWidth: '800px', margin: '0 auto', borderTop: `6px solid ${sdgColor}` }}>
-      
-      {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: 'var(--spacing-lg)' }}>
-        <div style={{ display: 'flex', gap: 'var(--spacing-md)' }}>
-          <div style={{ 
-            width: '64px', 
-            height: '64px', 
-            borderRadius: '50%', 
-            backgroundColor: 'var(--color-surface)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            overflow: 'hidden'
-          }}>
-            {faculty.imageUrl ? (
-              <img src={faculty.imageUrl} alt={faculty.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-            ) : (
-              <User size={32} color="var(--color-text-light)" />
-            )}
+    <article className="impact-card-shell card" style={{ '--sdg-color': sdgColor } as CSSProperties}>
+      <header className="impact-card-header-row">
+        <div className="impact-faculty">
+          <div className="impact-faculty-avatar">
+            {faculty.imageUrl ? <img src={faculty.imageUrl} alt={faculty.name} /> : <User size={30} />}
           </div>
           <div>
-            <h2 style={{ fontSize: 'var(--font-size-xl)', marginBottom: '4px' }}>{faculty.name}</h2>
-            <p className="text-muted" style={{ margin: 0 }}>{faculty.department}</p>
+            <h2>{faculty.name}</h2>
+            <p className="mb-0 text-muted">{faculty.department}</p>
           </div>
         </div>
-        <div className="badge" style={{ backgroundColor: sdgColor, color: '#fff', fontSize: 'var(--font-size-sm)' }}>
+
+        <span className="impact-sdg-badge">
           SDG {sdg.number}: {sdg.title}
-        </div>
-      </div>
+        </span>
+      </header>
 
-      {/* Narrative */}
-      <div className="mb-4">
-        <h3 style={{ fontSize: 'var(--font-size-lg)', marginBottom: 'var(--spacing-sm)' }}>The Impact Story</h3>
-        <p style={{ lineHeight: '1.7' }}>{narrative}</p>
-      </div>
+      <section className="impact-story-block">
+        <h3>The Impact Story</h3>
+        <p className="mb-0">{narrative}</p>
+      </section>
 
-      {/* Key Outcomes */}
-      <div className="mb-4" style={{ backgroundColor: 'var(--color-surface)', padding: 'var(--spacing-lg)', borderRadius: 'var(--radius-md)' }}>
-        <h3 style={{ fontSize: 'var(--font-size-md)', marginBottom: 'var(--spacing-md)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <TrendingUp size={20} color="var(--color-primary)" /> Key Real-World Outcomes
+      <section className="impact-outcomes-block">
+        <h3>
+          <TrendingUp size={18} /> Key Real-World Outcomes
         </h3>
-        <ul style={{ paddingLeft: '20px', margin: 0 }}>
-          {keyOutcomes.map((outcome, index) => (
-            <li key={index} style={{ marginBottom: '8px' }}>{outcome}</li>
+        <ul>
+          {keyOutcomes.map((outcome) => (
+            <li key={outcome}>{outcome}</li>
           ))}
         </ul>
+      </section>
+
+      <section className="impact-metrics-grid">
+        <div className="impact-metric-item">
+          <span>Total Funding</span>
+          <strong>${metrics.totalFunding.toLocaleString()}</strong>
+        </div>
+        <div className="impact-metric-item">
+          <span>Communities Reached</span>
+          <strong>{metrics.communitiesReached.toLocaleString()}</strong>
+        </div>
+        <div className="impact-metric-item warning">
+          <span>Funding Gap</span>
+          <strong>${metrics.fundingGap.toLocaleString()}</strong>
+        </div>
+      </section>
+
+      <div className="impact-cta-row">
+        <button className="btn btn-secondary">Fund This Impact</button>
+        <button className="btn btn-outline">Contact Researcher</button>
       </div>
 
-      {/* Metrics Grid */}
-      <div className="grid grid-3 mb-4">
-        <div className="text-center">
-          <div style={{ color: 'var(--color-text-light)', fontSize: 'var(--font-size-sm)', marginBottom: '4px' }}>Total Funding</div>
-          <div style={{ fontSize: 'var(--font-size-xl)', fontWeight: 700, color: 'var(--color-primary)' }}>
-            ${metrics.totalFunding.toLocaleString()}
-          </div>
-        </div>
-        <div className="text-center">
-          <div style={{ color: 'var(--color-text-light)', fontSize: 'var(--font-size-sm)', marginBottom: '4px' }}>Communities Reached</div>
-          <div style={{ fontSize: 'var(--font-size-xl)', fontWeight: 700, color: 'var(--color-success)' }}>
-            {metrics.communitiesReached.toLocaleString()}
-          </div>
-        </div>
-        <div className="text-center">
-          <div style={{ color: 'var(--color-text-light)', fontSize: 'var(--font-size-sm)', marginBottom: '4px' }}>Funding Gap</div>
-          <div style={{ fontSize: 'var(--font-size-xl)', fontWeight: 700, color: 'var(--color-warning)' }}>
-            ${metrics.fundingGap.toLocaleString()}
-          </div>
-        </div>
-      </div>
-
-      {/* Action Buttons */}
-      <div style={{ display: 'flex', gap: 'var(--spacing-md)', marginBottom: 'var(--spacing-xl)' }}>
-        <button className="btn btn-primary" style={{ flex: 1, justifyContent: 'center' }}>
-          Fund This Impact
-        </button>
-        <button className="btn btn-outline" style={{ flex: 1, justifyContent: 'center' }}>
-          Contact Researcher
-        </button>
-      </div>
-
-      {/* Evidence Drawer */}
-      <EvidenceDrawer 
+      <EvidenceDrawer
         publications={evidence.publications}
         grants={evidence.grants}
         patents={evidence.patents}
       />
 
-      {/* Validation Section (Impact Detective) */}
-      <div style={{ marginTop: 'var(--spacing-xl)', paddingTop: 'var(--spacing-lg)', borderTop: '1px solid var(--color-border)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Shield size={20} color="var(--color-text-light)" />
-            <span style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-light)', fontWeight: 600 }}>IMPACT DETECTIVE</span>
-          </div>
-          
-          {!hasValidated ? (
-            <div style={{ display: 'flex', gap: '12px' }}>
-              <button 
-                onClick={() => handleValidation('rejected')}
-                className="btn btn-outline" 
-                style={{ borderColor: 'var(--color-error)', color: 'var(--color-error)', padding: '6px 12px', fontSize: '14px' }}
-              >
-                <X size={16} style={{ marginRight: '4px' }} /> Reject
-              </button>
-              <button 
-                onClick={() => handleValidation('approved')}
-                className="btn" 
-                style={{ backgroundColor: 'var(--color-success)', color: '#fff', padding: '6px 12px', fontSize: '14px', border: 'none' }}
-              >
-                <Check size={16} style={{ marginRight: '4px' }} /> Approve
-              </button>
-            </div>
-          ) : (
-             <div style={{ color: 'var(--color-success)', fontWeight: 600, fontSize: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-               <Check size={18} /> Validated
-             </div>
-          )}
+      <footer className="impact-validation-row">
+        <div className="impact-validation-label">
+          <Shield size={18} />
+          <span>Impact Detective validation</span>
         </div>
-      </div>
 
-    </div>
-  );
+        {!hasValidated ? (
+          <div className="impact-validation-actions">
+            <button
+              onClick={() => handleValidation('rejected')}
+              className="btn btn-outline impact-reject-btn"
+            >
+              <X size={15} /> Reject
+            </button>
+            <button
+              onClick={() => handleValidation('approved')}
+              className="btn impact-approve-btn"
+            >
+              <Check size={15} /> Approve
+            </button>
+          </div>
+        ) : (
+          <span className="impact-validated-pill">
+            <Check size={15} /> Validated
+          </span>
+        )}
+      </footer>
+    </article>
+  )
 }

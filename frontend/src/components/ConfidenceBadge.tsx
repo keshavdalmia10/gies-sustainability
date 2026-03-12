@@ -1,3 +1,5 @@
+import type { CSSProperties } from 'react';
+
 interface ConfidenceBadgeProps {
   score: number; // 0.0 to 1.0
   label?: string;
@@ -24,7 +26,7 @@ export default function ConfidenceBadge({ score, label, size = 'md' }: Confidenc
   const percentage = Math.round(score * 100);
   
   // Inline styles for specific overrides if needed, or rely on index.css
-  const style: React.CSSProperties = {
+  const style: CSSProperties = {
     fontSize: size === 'sm' ? 'var(--font-size-xs)' : 'var(--font-size-sm)',
     padding: size === 'sm' ? '2px 6px' : '4px 8px',
   };

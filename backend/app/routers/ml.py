@@ -8,10 +8,21 @@ from uuid import UUID
 from pydantic import BaseModel
 
 from app.database import get_db
-from app.services.ml import get_sdg_classifier, get_impact_matcher
 from app.models import Publication
 
 router = APIRouter()
+
+
+def _get_sdg_classifier():
+    from app.services.ml.sdg_classifier import get_sdg_classifier
+
+    return get_sdg_classifier()
+
+
+def _get_impact_matcher():
+    from app.services.ml.impact_matcher import get_impact_matcher
+
+    return get_impact_matcher()
 
 
 # Request/Response schemas
@@ -53,7 +64,7 @@ async def classify_sdg(
     1. Binary sustainability relevance (OpenAI)
     2. Top-K SDG identification (sentence-transformers)
     """
-    classifier = get_sdg_classifier()
+    classifier = _get_sdg_classifier()
     
     try:
         result = await classifier.classify_full(
@@ -88,7 +99,7 @@ async def classify_publication(
         raise HTTPException(status_code=404, detail="Publication not found")
     
     # Classify
-    classifier = get_sdg_classifier()
+    classifier = _get_sdg_classifier()
     
     text = publication.abstract or publication.title
     classification = await classifier.classify_full(
@@ -128,7 +139,7 @@ async def match_publication_impacts(
     
     Returns ranked list of impacts with confidence scores
     """
-    matcher = get_impact_matcher()
+    matcher = _get_impact_matcher()
     
     try:
         matches = await matcher.match_publication_to_impacts(
@@ -177,7 +188,7 @@ async def batch_classify_publications(
     result = await db.execute(query)
     publications = result.scalars().all()
     
-    classifier = get_sdg_classifier()
+    classifier = _get_sdg_classifier()
     results = []
     
     for pub in publications:

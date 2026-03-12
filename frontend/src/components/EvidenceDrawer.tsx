@@ -1,159 +1,128 @@
-import { useState } from 'react';
-import { ChevronDown, ChevronUp, ExternalLink, FileText, Award, Lightbulb } from 'lucide-react';
-import ConfidenceBadge from './ConfidenceBadge';
+import { useState } from 'react'
+import { ChevronDown, ChevronUp, ExternalLink, FileText, Award, Lightbulb } from 'lucide-react'
+import ConfidenceBadge from './ConfidenceBadge'
+import './EvidenceDrawer.css'
 
 interface Publication {
-  id: string;
-  title: string;
-  journal?: string;
-  year?: number;
-  confidence: number;
-  url?: string;
+  id: string
+  title: string
+  journal?: string
+  year?: number
+  confidence: number
+  url?: string
 }
 
 interface Grant {
-  id: string;
-  title: string;
-  funder: string;
-  amount?: number;
-  confidence: number;
+  id: string
+  title: string
+  funder: string
+  amount?: number
+  confidence: number
 }
 
 interface Patent {
-  id: string;
-  title: string;
-  number: string;
-  confidence: number;
+  id: string
+  title: string
+  number: string
+  confidence: number
 }
 
 interface EvidenceDrawerProps {
-  publications: Publication[];
-  grants: Grant[];
-  patents: Patent[];
+  publications: Publication[]
+  grants: Grant[]
+  patents: Patent[]
 }
 
 export default function EvidenceDrawer({ publications, grants, patents }: EvidenceDrawerProps) {
-  const [isOpen, setIsOpen] = useState(false);
-
-  const totalItems = publications.length + grants.length + patents.length;
+  const [isOpen, setIsOpen] = useState(false)
+  const totalItems = publications.length + grants.length + patents.length
 
   return (
-    <div className="card" style={{ marginTop: 'var(--spacing-lg)', padding: '0' }}>
-      <button 
-        onClick={() => setIsOpen(!isOpen)}
-        style={{
-          width: '100%',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          padding: 'var(--spacing-lg)',
-          background: 'none',
-          border: 'none',
-          cursor: 'pointer',
-          textAlign: 'left'
-        }}
+    <div className="evidence-drawer card">
+      <button
+        className="evidence-toggle"
+        onClick={() => setIsOpen((prev) => !prev)}
+        aria-expanded={isOpen}
+        aria-controls="evidence-content"
       >
         <div>
-          <h3 className="card-title" style={{ fontSize: 'var(--font-size-lg)', marginBottom: '0' }}>
-            Evidence Drawer
-          </h3>
-          <p className="card-subtitle" style={{ marginBottom: '0' }}>
-            {totalItems} verified sources backing this impact
-          </p>
+          <h3 className="card-title">Evidence Drawer</h3>
+          <p className="card-subtitle mb-0">{totalItems} sources backing this impact card</p>
         </div>
-        {isOpen ? <ChevronUp size={24} /> : <ChevronDown size={24} />}
+        {isOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
       </button>
 
       {isOpen && (
-        <div style={{ padding: '0 var(--spacing-lg) var(--spacing-lg)' }}>
-          <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: 'var(--spacing-md)' }}>
-            
-            {/* Publications */}
-            {publications.length > 0 && (
-              <div className="mb-3">
-                <h4 style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: 'var(--font-size-md)' }}>
-                  <FileText size={18} /> Publications
-                </h4>
-                <div className="grid" style={{ gap: 'var(--spacing-md)' }}>
-                  {publications.map(pub => (
-                    <div key={pub.id} style={{ 
-                      padding: 'var(--spacing-md)', 
-                      backgroundColor: 'var(--color-surface)', 
-                      borderRadius: 'var(--radius-md)'
-                    }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '4px' }}>
-                        <span style={{ fontWeight: 600 }}>{pub.title}</span>
-                        <ConfidenceBadge score={pub.confidence} size="sm" />
-                      </div>
-                      <div style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-light)', display: 'flex', justifyContent: 'space-between' }}>
-                        <span>{pub.journal} ({pub.year})</span>
-                        {pub.url && (
-                          <a href={pub.url} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                            View <ExternalLink size={12} />
-                          </a>
-                        )}
-                      </div>
+        <div id="evidence-content" className="evidence-content">
+          {publications.length > 0 && (
+            <section className="evidence-section">
+              <h4>
+                <FileText size={16} /> Publications
+              </h4>
+              <div className="evidence-grid">
+                {publications.map((publication) => (
+                  <article key={publication.id} className="evidence-item">
+                    <div className="evidence-item-top">
+                      <strong>{publication.title}</strong>
+                      <ConfidenceBadge score={publication.confidence} size="sm" />
                     </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Grants */}
-            {grants.length > 0 && (
-              <div className="mb-3">
-                <h4 style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: 'var(--font-size-md)' }}>
-                  <Award size={18} /> Grants & Funding
-                </h4>
-                <div className="grid" style={{ gap: 'var(--spacing-md)' }}>
-                  {grants.map(grant => (
-                    <div key={grant.id} style={{ 
-                      padding: 'var(--spacing-md)', 
-                      backgroundColor: 'var(--color-surface)', 
-                      borderRadius: 'var(--radius-md)'
-                    }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '4px' }}>
-                        <span style={{ fontWeight: 600 }}>{grant.title}</span>
-                        <ConfidenceBadge score={grant.confidence} size="sm" />
-                      </div>
-                      <div style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-light)' }}>
-                        {grant.funder} • {grant.amount ? `$${grant.amount.toLocaleString()}` : 'Amount N/A'}
-                      </div>
+                    <div className="evidence-item-meta">
+                      <span>
+                        {publication.journal} {publication.year ? `(${publication.year})` : ''}
+                      </span>
+                      {publication.url && (
+                        <a href={publication.url} target="_blank" rel="noopener noreferrer">
+                          View <ExternalLink size={12} />
+                        </a>
+                      )}
                     </div>
-                  ))}
-                </div>
+                  </article>
+                ))}
               </div>
-            )}
+            </section>
+          )}
 
-            {/* Patents */}
-            {patents.length > 0 && (
-              <div className="mb-3">
-                <h4 style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: 'var(--font-size-md)' }}>
-                  <Lightbulb size={18} /> Patents
-                </h4>
-                <div className="grid" style={{ gap: 'var(--spacing-md)' }}>
-                  {patents.map(patent => (
-                    <div key={patent.id} style={{ 
-                      padding: 'var(--spacing-md)', 
-                      backgroundColor: 'var(--color-surface)', 
-                      borderRadius: 'var(--radius-md)'
-                    }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '4px' }}>
-                        <span style={{ fontWeight: 600 }}>{patent.title}</span>
-                        <ConfidenceBadge score={patent.confidence} size="sm" />
-                      </div>
-                      <div style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-light)' }}>
-                        Patent #{patent.number}
-                      </div>
+          {grants.length > 0 && (
+            <section className="evidence-section">
+              <h4>
+                <Award size={16} /> Grants and Funding
+              </h4>
+              <div className="evidence-grid">
+                {grants.map((grant) => (
+                  <article key={grant.id} className="evidence-item">
+                    <div className="evidence-item-top">
+                      <strong>{grant.title}</strong>
+                      <ConfidenceBadge score={grant.confidence} size="sm" />
                     </div>
-                  ))}
-                </div>
+                    <p className="evidence-item-meta mb-0">
+                      {grant.funder} {grant.amount ? `• $${grant.amount.toLocaleString()}` : ''}
+                    </p>
+                  </article>
+                ))}
               </div>
-            )}
+            </section>
+          )}
 
-          </div>
+          {patents.length > 0 && (
+            <section className="evidence-section">
+              <h4>
+                <Lightbulb size={16} /> Patents
+              </h4>
+              <div className="evidence-grid">
+                {patents.map((patent) => (
+                  <article key={patent.id} className="evidence-item">
+                    <div className="evidence-item-top">
+                      <strong>{patent.title}</strong>
+                      <ConfidenceBadge score={patent.confidence} size="sm" />
+                    </div>
+                    <p className="evidence-item-meta mb-0">Patent #{patent.number}</p>
+                  </article>
+                ))}
+              </div>
+            </section>
+          )}
         </div>
       )}
     </div>
-  );
+  )
 }

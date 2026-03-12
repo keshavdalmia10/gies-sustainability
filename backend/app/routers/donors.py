@@ -1,8 +1,6 @@
 from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
 from typing import List, Optional
-from langchain_openai import ChatOpenAI
-from langchain_core.messages import SystemMessage, HumanMessage
 import json
 import os
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -35,6 +33,9 @@ async def search_donors(request: DonorSearchRequest):
     try:
         # Initialize LLM
         # Note: Requires OPENAI_API_KEY in environment
+        from langchain_openai import ChatOpenAI
+        from langchain_core.messages import SystemMessage, HumanMessage
+
         llm = ChatOpenAI(model="gpt-4o", temperature=0.7)
         
         system_prompt = """You are an expert fundraising consultant. 
@@ -136,6 +137,9 @@ async def find_projects(request: ProjectSearchRequest, db: AsyncSession = Depend
             return {"matches": []}
 
         # 4. AI Matching
+        from langchain_openai import ChatOpenAI
+        from langchain_core.messages import SystemMessage, HumanMessage
+
         llm = ChatOpenAI(model="gpt-4o", temperature=0.5)
         
         system_prompt = """You are an expert grant evaluator.

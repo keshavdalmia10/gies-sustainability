@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Send, User, BookOpen, Search } from 'lucide-react';
+import api from '../../services/api';
 
 interface SuggestedNode {
   id: string;
@@ -22,23 +23,12 @@ const NetworkChatbot: React.FC<NetworkChatbotProps> = ({ onGraphUpdate }) => {
     if (!query) return;
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:8000/api/v1/networking/analyze', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ query }),
-      });
-      
-      if (res.ok) {
-        const data = await res.json();
-        setResponse(data.response);
-        setSuggestions(data.suggested_connections);
-        if (data.graph_data && onGraphUpdate) {
-          onGraphUpdate(data.graph_data);
-        }
-      } else {
-        setResponse('Error analyzing network.');
+      const res = await api.post('/networking/analyze', { query });
+      const data = res.data;
+      setResponse(typeof data?.response === 'string' ? data.response : 'No response available.');
+      setSuggestions(Array.isArray(data?.suggested_connections) ? data.suggested_connections : []);
+      if (data.graph_data && onGraphUpdate) {
+        onGraphUpdate(data.graph_data);
       }
     } catch (error) {
       setResponse('Error connecting to server.');

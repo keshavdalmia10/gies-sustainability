@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { TrendingUp, AlertTriangle, Target, Users, FileText, DollarSign } from 'lucide-react';
 import { DepartmentBarChart, DonutChart, DepartmentData } from '../AnalyticsCharts';
+import api from '../../services/api';
 
 export default function DeanOverviewTab() {
   const [departmentData, setDepartmentData] = useState<DepartmentData[]>([]);
@@ -9,20 +10,28 @@ export default function DeanOverviewTab() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const deptRes = await fetch('http://localhost:8000/api/v1/analytics/departments');
-        const deptJson = await deptRes.json();
-        setDepartmentData(deptJson);
+        const deptRes = await api.get('/analytics/departments');
+        setDepartmentData(Array.isArray(deptRes.data) ? deptRes.data : []);
 
-        const summaryRes = await fetch('http://localhost:8000/api/v1/analytics/summary');
-        const summaryJson = await summaryRes.json();
-        setSummaryData(summaryJson);
+        const summaryRes = await api.get('/analytics/summary');
+        setSummaryData(summaryRes.data);
       } catch (error) {
         console.error("Failed to fetch analytics data", error);
+        setDepartmentData([]);
+        setSummaryData(null);
       }
     };
 
     fetchData();
   }, []);
+
+  const summary = summaryData && typeof summaryData === 'object' ? summaryData : {};
+  const sdgRelevance = summary?.sdg_relevance ?? {};
+  const facultyEngagement = summary?.faculty_engagement ?? {};
+  const sdgRelevant = Number(sdgRelevance?.relevant) || 0;
+  const sdgTotal = Number(sdgRelevance?.total) || 0;
+  const engagedFaculty = Number(facultyEngagement?.engaged) || 0;
+  const totalFaculty = Number(facultyEngagement?.total) || 0;
 
   return (
     <div>
@@ -46,8 +55,8 @@ export default function DeanOverviewTab() {
             </div>
             <div style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-light)', fontWeight: 600 }}>ACTIVE FACULTY</div>
           </div>
-          <div style={{ fontSize: 'var(--font-size-2xl)', fontWeight: 700, marginBottom: '4px' }}>{summaryData?.faculty_engagement?.total || 114}</div>
-          <div className="text-muted">{summaryData?.faculty_engagement?.percentage || 74}% of Total Faculty</div>
+          <div style={{ fontSize: 'var(--font-size-2xl)', fontWeight: 700, marginBottom: '4px' }}>{facultyEngagement?.total || 114}</div>
+          <div className="text-muted">{facultyEngagement?.percentage || 74}% of Total Faculty</div>
         </div>
 
         <div className="card" style={{ padding: 'var(--spacing-lg)' }}>
@@ -57,8 +66,8 @@ export default function DeanOverviewTab() {
             </div>
             <div style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-light)', fontWeight: 600 }}>SDG ARTICLES</div>
           </div>
-          <div style={{ fontSize: 'var(--font-size-2xl)', fontWeight: 700, marginBottom: '4px' }}>{summaryData?.sdg_relevance?.relevant || 711}</div>
-          <div className="text-muted">{summaryData?.sdg_relevance?.percentage || 19}% of Total Research</div>
+          <div style={{ fontSize: 'var(--font-size-2xl)', fontWeight: 700, marginBottom: '4px' }}>{sdgRelevance?.relevant || 711}</div>
+          <div className="text-muted">{sdgRelevance?.percentage || 19}% of Total Research</div>
         </div>
 
         <div className="card" style={{ padding: 'var(--spacing-lg)' }}>
@@ -132,10 +141,10 @@ export default function DeanOverviewTab() {
         <div className="card">
           <h3 className="card-title">Proportion of SDG Relevant Articles</h3>
           <p className="card-subtitle mb-3">The proportion of articles that align with UN sustainability goals</p>
-          {summaryData && (
+          {(sdgTotal > 0 || sdgRelevant > 0) && (
             <DonutChart 
-              value={summaryData.sdg_relevance.relevant} 
-              total={summaryData.sdg_relevance.total} 
+              value={sdgRelevant} 
+              total={sdgTotal} 
               label="SDG Relevant" 
               color="#0066cc" 
             />
@@ -144,10 +153,10 @@ export default function DeanOverviewTab() {
         <div className="card">
           <h3 className="card-title">Proportion of Faculty Engaged in SDG Research</h3>
           <p className="card-subtitle mb-3">Percentage of faculty contributing to sustainability publications</p>
-          {summaryData && (
+          {(totalFaculty > 0 || engagedFaculty > 0) && (
             <DonutChart 
-              value={summaryData.faculty_engagement.engaged} 
-              total={summaryData.faculty_engagement.total} 
+              value={engagedFaculty} 
+              total={totalFaculty} 
               label="Engaged" 
               color="#8884d8" 
             />

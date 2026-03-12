@@ -1,0 +1,98 @@
+.networking-view {
+  animation: fadeIn var(--transition-slow) ease-out;
+}
+
+.networking-header {
+  gap: 0.65rem;
+}
+
+.networking-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  padding: 0.45rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  background: rgba(255, 255, 255, 0.82);
+}
+
+.networking-tab {
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  padding: 0.52rem 0.84rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: transparent;
+  color: var(--color-text-light);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.networking-tab:hover {
+  color: var(--color-primary-dark);
+  background: rgba(15, 118, 110, 0.1);
+}
+
+.networking-tab.active {
+  color: #ffffff;
+  background: linear-gradient(135deg, var(--color-primary) 0%, #0d6b64 100%);
+  box-shadow: 0 8px 18px rgba(15, 118, 110, 0.24);
+}
+
+.networking-main-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
+  gap: var(--spacing-md);
+}
+
+.networking-primary-column,
+.networking-side-column {
+  display: grid;
+  gap: var(--spacing-md);
+  align-content: start;
+}
+
+.networking-chat-shell {
+  min-height: 490px;
+}
+
+.networking-chat-shell .card {
+  height: 100%;
+}
+
+.networking-full-width {
+  display: grid;
+  gap: var(--spacing-md);
+}
+
+.network-graph-panel .card-subtitle {
+  color: var(--color-text-light);
+}
+
+.network-graph-canvas {
+  min-height: 520px;
+}
+
+@media (max-width: 1020px) {
+  .networking-main-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .networking-chat-shell {
+    min-height: 420px;
+  }
+}
+
+@media (max-width: 760px) {
+  .networking-tabs {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+  }
+
+  .networking-tab {
+    white-space: nowrap;
+  }
+}

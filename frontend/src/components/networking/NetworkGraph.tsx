@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import ForceGraph2D from 'react-force-graph-2d';
+import api from '../../services/api';
 
 interface ApiGraphData {
   nodes: any[];
@@ -23,20 +24,22 @@ const NetworkGraph: React.FC<NetworkGraphProps> = ({ data }) => {
 
   useEffect(() => {
     // If data is provided (from chatbot), use it
-    if (data && data.nodes.length > 0) {
+    if (data && Array.isArray(data.nodes) && data.nodes.length > 0) {
       // Map edges to links for react-force-graph
       setGraphData({
         nodes: [...data.nodes],
-        links: data.edges.map((e: any) => ({ source: e.source, target: e.target }))
+        links: Array.isArray(data.edges) ? data.edges.map((e: any) => ({ source: e.source, target: e.target })) : []
       });
     } else {
       // Otherwise fetch full graph
-      fetch('http://localhost:8000/api/v1/networking/graph')
-        .then(res => res.json())
-        .then(data => {
+      api.get('/networking/graph')
+        .then(res => {
+            const data = res.data;
+            const nodes = Array.isArray(data?.nodes) ? data.nodes : [];
+            const edges = Array.isArray(data?.edges) ? data.edges : [];
             setGraphData({
-                nodes: data.nodes,
-                links: data.edges.map((e: any) => ({ source: e.source, target: e.target }))
+                nodes,
+                links: edges.map((e: any) => ({ source: e.source, target: e.target }))
             });
         })
         .catch(err => console.error("Failed to fetch graph", err));
@@ -72,7 +75,8 @@ const NetworkGraph: React.FC<NetworkGraphProps> = ({ data }) => {
         linkDirectionalParticleSpeed={() => 0.005}
         backgroundColor="#ffffff"
         nodeCanvasObject={(node: any, ctx, globalScale) => {
-          const label = node.label;
+          const label = typeof node.label === 'string' ? node.label : String(node.label ?? '');
+          if (!Number.isFinite(node.x) || !Number.isFinite(node.y)) return;
           const fontSize = 12/globalScale;
           ctx.font = `${fontSize}px Sans-Serif`;
           const textWidth = ctx.measureText(label).width;
@@ -99,7 +103,8 @@ const NetworkGraph: React.FC<NetworkGraphProps> = ({ data }) => {
         nodePointerAreaPaint={(node: any, color, ctx) => {
           ctx.fillStyle = color;
           const bckgDimensions = node.__bckgDimensions;
-          bckgDimensions && ctx.fillRect(node.x - bckgDimensions[0] / 2, node.y - bckgDimensions[1] / 2, bckgDimensions[0], bckgDimensions[1]);
+          if (!bckgDimensions || !Number.isFinite(node.x) || !Number.isFinite(node.y)) return;
+          ctx.fillRect(node.x - bckgDimensions[0] / 2, node.y - bckgDimensions[1] / 2, bckgDimensions[0], bckgDimensions[1]);
         }}
       />
     </div>

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Trophy, Medal } from 'lucide-react';
+import api from '../../services/api';
 
 interface LeaderboardEntry {
   name: string;
@@ -16,11 +17,8 @@ const Leaderboard: React.FC = () => {
     // Fetch leaderboard data
     const fetchLeaderboard = async () => {
       try {
-        const response = await fetch('http://localhost:8000/api/v1/gamification/leaderboard?limit=5');
-        if (response.ok) {
-          const data = await response.json();
-          setLeaders(data);
-        }
+        const response = await api.get('/gamification/leaderboard?limit=5');
+        setLeaders(Array.isArray(response.data) ? response.data : []);
       } catch (error) {
         console.error("Failed to fetch leaderboard", error);
       } finally {

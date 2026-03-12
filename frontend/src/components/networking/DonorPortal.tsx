@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Search, User, GraduationCap, Mail, ArrowRight } from 'lucide-react';
+import api from '../../services/api';
 
 interface ProjectMatch {
   name: string;
@@ -24,22 +25,11 @@ const DonorPortal: React.FC = () => {
     setMatches([]); 
     
     try {
-      const response = await fetch('http://localhost:8000/api/v1/donors/find-projects', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ donor_interest: interest }),
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        setMatches(data.matches);
-      } else {
-        console.error('Failed to fetch projects');
-      }
+      const response = await api.post('/donors/find-projects', { donor_interest: interest });
+      setMatches(Array.isArray(response.data?.matches) ? response.data.matches : []);
     } catch (error) {
       console.error('Error:', error);
+      setMatches([]);
     } finally {
       setLoading(false);
     }

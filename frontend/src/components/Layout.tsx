@@ -1,6 +1,15 @@
 import { ReactNode } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Award, CheckCircle } from 'lucide-react'
+import {
+  Building2,
+  CheckCircle2,
+  GraduationCap,
+  HeartHandshake,
+  Home,
+  Network,
+  ShieldCheck,
+  XCircle,
+} from 'lucide-react'
 import { useImpactDetective } from '../hooks/useImpactDetective'
 import './Layout.css'
 
@@ -8,85 +17,89 @@ interface LayoutProps {
   children: ReactNode
 }
 
+const NAV_ITEMS = [
+  { to: '/', label: 'Home', icon: Home },
+  { to: '/dean', label: 'Dean View', icon: Building2 },
+  { to: '/donor', label: 'Donor View', icon: HeartHandshake },
+  { to: '/student', label: 'Student View', icon: GraduationCap },
+  { to: '/networking', label: 'Networking', icon: Network },
+]
+
 export default function Layout({ children }: LayoutProps) {
   const location = useLocation()
   const { validationCount, showToast, lastAction } = useImpactDetective()
-  
-  const isActive = (path: string) => location.pathname === path
-  
+
+  const isActive = (path: string) =>
+    path === '/' ? location.pathname === '/' : location.pathname.startsWith(path)
+
   return (
     <div className="app-layout">
-      <header className="header">
-        <div className="container header-content">
-          <Link to="/" className="logo">
-            <span className="logo-icon">🌱</span>
-            <span className="logo-text">Gies Sustainability Impact</span>
-          </Link>
-          
-          <nav className="nav">
-            <Link to="/" className={isActive('/') ? 'nav-link active' : 'nav-link'}>
-              Home
-            </Link>
-            <Link to="/dean" className={isActive('/dean') ? 'nav-link active' : 'nav-link'}>
-              Dean View
-            </Link>
-            <Link to="/donor" className={isActive('/donor') ? 'nav-link active' : 'nav-link'}>
-              Donor View
-            </Link>
-            <Link to="/student" className={isActive('/student') ? 'nav-link active' : 'nav-link'}>
-              Student View
-            </Link>
-            <Link to="/networking" className={isActive('/networking') ? 'nav-link active' : 'nav-link'}>
-              Networking
-            </Link>
-            
-            {/* Impact Detective Badge */}
-            <div className="nav-link" style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--color-primary)', fontWeight: 600, cursor: 'default' }}>
-              <Award size={18} />
-              <span>{validationCount}</span>
+      <header className="site-header">
+        <div className="container site-header-inner">
+          <Link to="/" className="brand" aria-label="Go to dashboard home">
+            <div className="brand-mark" aria-hidden="true">
+              <span>G</span>
             </div>
+            <div className="brand-copy">
+              <span className="brand-title">Gies Sustainability Impact</span>
+              <span className="brand-subtitle">From data to decisions</span>
+            </div>
+          </Link>
+
+          <div className="header-chip" aria-live="polite">
+            <ShieldCheck size={16} />
+            <span>{validationCount} validations logged</span>
+          </div>
+        </div>
+
+        <div className="container">
+          <nav className="layout-nav" aria-label="Primary">
+            {NAV_ITEMS.map((item) => {
+              const Icon = item.icon
+              return (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  className={isActive(item.to) ? 'layout-nav-link active' : 'layout-nav-link'}
+                >
+                  <Icon size={15} />
+                  <span>{item.label}</span>
+                </Link>
+              )
+            })}
           </nav>
         </div>
       </header>
-      
-      <main className="main-content">
-        {children}
-      </main>
-      
-      {/* Toast Notification */}
+
+      <main className="main-content">{children}</main>
+
       {showToast && (
-        <div style={{
-          position: 'fixed',
-          bottom: '24px',
-          right: '24px',
-          backgroundColor: '#fff',
-          padding: '16px 24px',
-          borderRadius: '8px',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '12px',
-          zIndex: 1000,
-          animation: 'slideUp 0.3s ease-out',
-          borderLeft: '4px solid var(--color-success)'
-        }}>
-          <CheckCircle size={24} color="var(--color-success)" />
+        <div
+          className={
+            lastAction === 'approved'
+              ? 'impact-toast impact-toast-approved'
+              : 'impact-toast impact-toast-rejected'
+          }
+          role="status"
+          aria-live="polite"
+        >
+          {lastAction === 'approved' ? <CheckCircle2 size={20} /> : <XCircle size={20} />}
           <div>
-            <div style={{ fontWeight: 600, fontSize: '14px' }}>
-              {lastAction === 'approved' ? 'Impact Verified!' : 'Feedback Recorded'}
-            </div>
-            <div style={{ fontSize: '12px', color: 'var(--color-text-light)' }}>
-              You just strengthened our impact story! ({validationCount} total)
-            </div>
+            <p className="impact-toast-title">
+              {lastAction === 'approved' ? 'Impact evidence approved' : 'Feedback submitted'}
+            </p>
+            <p className="impact-toast-copy">Community trust increased to {validationCount} reviews.</p>
           </div>
         </div>
       )}
-      
-      <footer className="footer">
-        <div className="container footer-content">
-          <p>&copy; 2024 Gies College of Business, University of Illinois</p>
-          <p className="text-small text-muted">
-            Sustainability Impact Dashboard - Pillar 2: From Data to Decisions
+
+      <footer className="site-footer">
+        <div className="container site-footer-content">
+          <p className="mb-0">
+            &copy; {new Date().getFullYear()} Gies College of Business, University of Illinois
+          </p>
+          <p className="text-small text-muted mb-0">
+            Sustainability Impact Dashboard: Pillar 2, transparent impact intelligence.
           </p>
         </div>
       </footer>

@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react'
-import { Heart, TrendingUp, DollarSign, MapPin } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import { Heart, TrendingUp, DollarSign, MapPin, Sparkles, Target } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import api from '../services/api'
 import './DonorView.css'
 
@@ -15,6 +16,12 @@ interface ImpactCard {
   geography: string
   faculty_name?: string
   department?: string
+}
+
+const SDG_COLORS: Record<number, string> = {
+  7: '#FCC30B',
+  13: '#3F7E44',
+  11: '#FD9D24',
 }
 
 export default function DonorView() {
@@ -40,25 +47,38 @@ export default function DonorView() {
     }
   }
 
-  const SDGColors: Record<number, string> = {
-    7: '#FCC30B',
-    13: '#3F7E44',
-    11: '#FD9D24',
-  }
+  const portfolioTotals = useMemo(
+    () => ({
+      fundingGap: impactCards.reduce((sum, card) => sum + card.funding_gap, 0),
+      invested: impactCards.reduce((sum, card) => sum + card.total_funding, 0),
+    }),
+    [impactCards],
+  )
 
   return (
-    <div className="donor-view container">
-      <div className="page-header">
+    <div className="donor-view container page-shell">
+      <header className="page-header donor-header">
+        <span className="eyebrow">
+          <Sparkles size={12} /> Donor Lens
+        </span>
         <h1>Impact Investment Opportunities</h1>
         <p className="page-subtitle">
-          Discover high-impact research projects that transform communities and advance sustainability
+          Discover verified research stories with transparent evidence, current funding, and clear support gaps.
         </p>
-      </div>
+        <div className="donor-header-pills">
+          <span className="pill">
+            <Target size={14} /> Evidence-backed impact cards
+          </span>
+          <span className="pill">
+            <Heart size={14} /> Human-validated confidence loop
+          </span>
+        </div>
+      </header>
 
-      {/* Filters */}
-      <div className="filters card">
-        <h3>Filter by SDG</h3>
-        <div className="sdg-filters">
+      <section className="filters card">
+        <h3>Filter by SDG focus</h3>
+        <p className="text-muted mb-2">Narrow to a theme to compare funding opportunities side by side.</p>
+        <div className="sdg-filters" role="tablist" aria-label="SDG filters">
           <button
             className={!selectedSDG ? 'btn btn-primary' : 'btn btn-outline'}
             onClick={() => setSelectedSDG(null)}
@@ -78,26 +98,26 @@ export default function DonorView() {
             SDG 13: Climate Action
           </button>
         </div>
-      </div>
+      </section>
 
-      {/* Impact Cards Grid */}
       {loading ? (
-        <div className="loading-state">
-          <div className="skeleton" style={{ height: '200px', marginBottom: '1rem' }}></div>
-          <div className="skeleton" style={{ height: '200px', marginBottom: '1rem' }}></div>
-          <div className="skeleton" style={{ height: '200px' }}></div>
+        <div className="loading-state" aria-live="polite">
+          <div className="skeleton" style={{ height: '220px', marginBottom: '1rem' }} />
+          <div className="skeleton" style={{ height: '220px', marginBottom: '1rem' }} />
+          <div className="skeleton" style={{ height: '220px' }} />
         </div>
       ) : impactCards.length === 0 ? (
         <div className="empty-state card">
-          <p>No impact cards available yet. Generate some using the backend!</p>
+          <h3>No published impact cards found</h3>
+          <p className="mb-2">Generate or publish cards in the backend to unlock donor opportunities here.</p>
           <code>python scripts/generate_sdg7_cards.py --limit 10</code>
         </div>
       ) : (
-        <div className="impact-cards-grid">
+        <section className="impact-cards-grid">
           {impactCards.map((card) => (
-            <div key={card.card_id} className="impact-card card">
+            <article key={card.card_id} className="impact-card card">
               <div className="card-header">
-                <div className="sdg-badge" style={{ backgroundColor: SDGColors[card.sdg] || '#0066cc' }}>
+                <div className="sdg-badge" style={{ backgroundColor: SDG_COLORS[card.sdg] || '#0066cc' }}>
                   SDG {card.sdg}
                 </div>
                 <h3 className="card-title">{card.title}</h3>
@@ -106,7 +126,7 @@ export default function DonorView() {
               <p className="card-summary">{card.summary}</p>
 
               <div className="outcomes">
-                <h4>Key Outcomes</h4>
+                <h4>Key outcomes</h4>
                 <ul className="outcomes-list">
                   {card.key_outcomes.slice(0, 4).map((outcome, idx) => (
                     <li key={idx}>
@@ -121,14 +141,14 @@ export default function DonorView() {
                 <div className="metric">
                   <DollarSign size={20} />
                   <div>
-                    <div className="metric-label">Total Funding</div>
+                    <div className="metric-label">Current Funding</div>
                     <div className="metric-value">${card.total_funding.toLocaleString()}</div>
                   </div>
                 </div>
                 <div className="metric">
                   <Heart size={20} />
                   <div>
-                    <div className="metric-label">Funding Gap</div>
+                    <div className="metric-label">Open Funding Gap</div>
                     <div className="metric-value highlight">${card.funding_gap.toLocaleString()}</div>
                   </div>
                 </div>
@@ -142,21 +162,18 @@ export default function DonorView() {
               )}
 
               <div className="card-actions">
-                <a href={`/impact-card/${card.card_id}`} className="btn btn-outline">
-                  View Details →
-                </a>
-                <button className="btn btn-secondary">
-                  Fund This Project
-                </button>
+                <Link to={`/impact-card/${card.card_id}`} className="btn btn-outline">
+                  View Evidence
+                </Link>
+                <button className="btn btn-secondary">Fund This Project</button>
               </div>
-            </div>
+            </article>
           ))}
-        </div>
+        </section>
       )}
 
-      {/* Summary Stats */}
       {impactCards.length > 0 && (
-        <div className="summary-stats card">
+        <section className="summary-stats card">
           <h3>Portfolio Summary</h3>
           <div className="stats-grid">
             <div className="stat">
@@ -164,19 +181,15 @@ export default function DonorView() {
               <div className="stat-label">Impact Opportunities</div>
             </div>
             <div className="stat">
-              <div className="stat-value">
-                ${impactCards.reduce((sum, card) => sum + card.funding_gap, 0).toLocaleString()}
-              </div>
+              <div className="stat-value">${portfolioTotals.fundingGap.toLocaleString()}</div>
               <div className="stat-label">Total Funding Needed</div>
             </div>
             <div className="stat">
-              <div className="stat-value">
-                ${impactCards.reduce((sum, card) => sum + card.total_funding, 0).toLocaleString()}
-              </div>
+              <div className="stat-value">${portfolioTotals.invested.toLocaleString()}</div>
               <div className="stat-label">Current Investment</div>
             </div>
           </div>
-        </div>
+        </section>
       )}
     </div>
   )

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { User, Save, Check } from 'lucide-react';
+import { Save, Check } from 'lucide-react';
+import api from '../../services/api';
 
 interface Faculty {
   person_uuid: string;
@@ -23,13 +24,11 @@ const FacultyUpdate: React.FC = () => {
   const fetchFaculty = async () => {
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:8000/api/v1/faculty/?limit=100');
-      if (response.ok) {
-        const data = await response.json();
-        setFacultyList(data);
-      }
+      const response = await api.get('/faculty/?limit=100');
+      setFacultyList(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error('Error fetching faculty:', error);
+      setFacultyList([]);
     } finally {
       setLoading(false);
     }
@@ -49,24 +48,13 @@ const FacultyUpdate: React.FC = () => {
     
     setSaving(true);
     try {
-      const response = await fetch(`http://localhost:8000/api/v1/faculty/${selectedFaculty}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ current_work: currentWork }),
-      });
-      
-      if (response.ok) {
-        setMessage('Status updated successfully!');
-        // Update local list
-        setFacultyList(prev => prev.map(f => 
-          f.person_uuid === selectedFaculty ? { ...f, current_work: currentWork } : f
-        ));
-        setTimeout(() => setMessage(''), 3000);
-      } else {
-        setMessage('Failed to update status.');
-      }
+      await api.patch(`/faculty/${selectedFaculty}`, { current_work: currentWork });
+      setMessage('Status updated successfully!');
+      // Update local list
+      setFacultyList(prev => prev.map(f => 
+        f.person_uuid === selectedFaculty ? { ...f, current_work: currentWork } : f
+      ));
+      setTimeout(() => setMessage(''), 3000);
     } catch (error) {
       console.error('Error updating faculty:', error);
       setMessage('Error connecting to server.');

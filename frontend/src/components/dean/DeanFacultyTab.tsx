@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 import { FacultyBarChart, FacultyData } from '../AnalyticsCharts';
+import api from '../../services/api';
 
 const ENGAGEMENT_DATA = [
   { name: 'Engaged in SDG Research', value: 114 },
@@ -25,11 +26,11 @@ export default function DeanFacultyTab() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch('http://localhost:8000/api/v1/analytics/faculty/top');
-        const json = await res.json();
-        setFacultyData(json);
+        const res = await api.get('/analytics/faculty/top');
+        setFacultyData(Array.isArray(res.data) ? res.data : []);
       } catch (error) {
         console.error("Failed to fetch faculty data", error);
+        setFacultyData([]);
       }
     };
 
@@ -64,7 +65,7 @@ export default function DeanFacultyTab() {
                   paddingAngle={5}
                   dataKey="value"
                 >
-                  {ENGAGEMENT_DATA.map((entry, index) => (
+                  {ENGAGEMENT_DATA.map((_, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>

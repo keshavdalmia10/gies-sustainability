@@ -15,11 +15,21 @@ load_dotenv()
 DATABASE_URL = os.getenv("DATABASE_URL")
 DATABASE_ASYNC_URL = os.getenv("DATABASE_ASYNC_URL")
 
+
+def _normalize_local_database_url(url: str | None) -> str | None:
+    if not url:
+        return url
+    return url.replace("@localhost:", "@127.0.0.1:")
+
 # Synchronous engine (for migrations and scripts)
-engine = create_engine(DATABASE_URL, echo=False)
+engine = create_engine(_normalize_local_database_url(DATABASE_URL), echo=False)
 
 # Async engine (for FastAPI)
-async_engine = create_async_engine(DATABASE_ASYNC_URL, echo=False)
+async_engine = create_async_engine(
+    _normalize_local_database_url(DATABASE_ASYNC_URL),
+    echo=False,
+    connect_args={"ssl": False},
+)
 
 # Session makers
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

@@ -1,0 +1,78 @@
+.dean-view {
+  animation: fadeIn var(--transition-slow) ease-out;
+}
+
+.dean-header {
+  gap: 0.7rem;
+}
+
+.dean-signals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.dean-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  padding: 0.45rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.dean-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  padding: 0.55rem 0.9rem;
+  background: transparent;
+  color: var(--color-text-light);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.dean-tab:hover {
+  color: var(--color-primary-dark);
+  background: rgba(15, 118, 110, 0.1);
+}
+
+.dean-tab.active {
+  color: #ffffff;
+  background: linear-gradient(135deg, var(--color-primary) 0%, #0d6b64 100%);
+  box-shadow: 0 8px 18px rgba(15, 118, 110, 0.24);
+}
+
+.dean-tab-panel {
+  display: grid;
+  gap: var(--spacing-lg);
+}
+
+.dean-tab-panel .card {
+  border-radius: var(--radius-lg);
+}
+
+.dean-tab-panel .card:hover {
+  transform: none;
+}
+
+.dean-tab-panel table th {
+  color: var(--color-text-light);
+  font-weight: 700;
+}
+
+@media (max-width: 768px) {
+  .dean-tabs {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+  }
+
+  .dean-tab {
+    white-space: nowrap;
+  }
+}

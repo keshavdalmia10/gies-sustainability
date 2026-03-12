@@ -1,98 +1,108 @@
-import React, { useState } from 'react';
-import ProfileUpload from '../components/networking/ProfileUpload';
-import NetworkChatbot from '../components/networking/NetworkChatbot';
-import NetworkGraph from '../components/networking/NetworkGraph';
-import Leaderboard from '../components/networking/Leaderboard';
-import DonorSearch from '../components/networking/DonorSearch';
-import DonorPortal from '../components/networking/DonorPortal';
-import FacultyUpdate from '../components/networking/FacultyUpdate';
+import { useState } from 'react'
+import { Sparkles, Network, Search, UserCircle2, Coins, UserRound, type LucideIcon } from 'lucide-react'
+import ProfileUpload from '../components/networking/ProfileUpload'
+import NetworkChatbot from '../components/networking/NetworkChatbot'
+import NetworkGraph from '../components/networking/NetworkGraph'
+import Leaderboard from '../components/networking/Leaderboard'
+import DonorSearch from '../components/networking/DonorSearch'
+import DonorPortal from '../components/networking/DonorPortal'
+import FacultyUpdate from '../components/networking/FacultyUpdate'
+import './Networking.css'
 
-const Networking: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'profile' | 'graph' | 'funding' | 'donors' | 'faculty'>('profile');
-  const [graphData, setGraphData] = useState<any>(null);
+type NetworkingTab = 'profile' | 'graph' | 'funding' | 'donors' | 'faculty'
+
+const TAB_CONFIG: { id: NetworkingTab; label: string; icon: LucideIcon }[] = [
+  { id: 'profile', label: 'Create Profile', icon: UserCircle2 },
+  { id: 'graph', label: 'Network Analysis', icon: Network },
+  { id: 'funding', label: 'Find Funding', icon: Search },
+  { id: 'donors', label: 'For Donors', icon: Coins },
+  { id: 'faculty', label: 'Faculty Updates', icon: UserRound },
+]
+
+export default function Networking() {
+  const [activeTab, setActiveTab] = useState<NetworkingTab>('profile')
+  const [graphData, setGraphData] = useState<any>(null)
 
   const handleGraphUpdate = (data: any) => {
-    setGraphData(data);
-    // Switch to graph tab if not already
+    const safeGraphData =
+      data && Array.isArray(data.nodes) && Array.isArray(data.edges)
+        ? data
+        : null
+    setGraphData(safeGraphData)
     if (activeTab !== 'graph') {
-      setActiveTab('graph');
+      setActiveTab('graph')
     }
-  };
+  }
 
   return (
-    <div className="container" style={{ paddingBottom: 'var(--spacing-2xl)' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--spacing-xl)' }}>
-        <h1 className="mb-0">Networking & Collaboration</h1>
-      </div>
-      
-      <div className="card mb-4" style={{ padding: 'var(--spacing-sm)', display: 'inline-flex', gap: 'var(--spacing-sm)', backgroundColor: 'var(--color-surface)', flexWrap: 'wrap' }}>
-        <button
-          className={`btn ${activeTab === 'profile' ? 'btn-primary' : 'btn-outline'}`}
-          onClick={() => setActiveTab('profile')}
-          style={{ border: 'none' }}
-        >
-          Create Profile
-        </button>
-        <button
-          className={`btn ${activeTab === 'graph' ? 'btn-primary' : 'btn-outline'}`}
-          onClick={() => setActiveTab('graph')}
-          style={{ border: 'none' }}
-        >
-          Network Analysis
-        </button>
-        <button
-          className={`btn ${activeTab === 'funding' ? 'btn-primary' : 'btn-outline'}`}
-          onClick={() => setActiveTab('funding')}
-          style={{ border: 'none' }}
-        >
-          Find Funding
-        </button>
-        <button
-          className={`btn ${activeTab === 'donors' ? 'btn-primary' : 'btn-outline'}`}
-          onClick={() => setActiveTab('donors')}
-          style={{ border: 'none' }}
-        >
-          For Donors
-        </button>
-        <button
-          className={`btn ${activeTab === 'faculty' ? 'btn-primary' : 'btn-outline'}`}
-          onClick={() => setActiveTab('faculty')}
-          style={{ border: 'none' }}
-        >
-          Faculty Updates
-        </button>
+    <div className="container networking-view page-shell">
+      <header className="page-header networking-header">
+        <span className="eyebrow">
+          <Sparkles size={12} /> Collaboration Hub
+        </span>
+        <h1>Networking and Opportunity Matching</h1>
+        <p className="page-subtitle">
+          Build profiles, discover collaborators, and connect donors to active projects through one network layer.
+        </p>
+      </header>
+
+      <div className="networking-tabs" role="tablist" aria-label="Networking modules">
+        {TAB_CONFIG.map((tab) => {
+          const Icon = tab.icon
+          const selected = activeTab === tab.id
+          return (
+            <button
+              key={tab.id}
+              className={selected ? 'networking-tab active' : 'networking-tab'}
+              onClick={() => setActiveTab(tab.id)}
+              role="tab"
+              aria-selected={selected}
+            >
+              <Icon size={15} />
+              <span>{tab.label}</span>
+            </button>
+          )
+        })}
       </div>
 
       {activeTab === 'funding' ? (
-        <DonorSearch />
+        <section className="networking-full-width">
+          <DonorSearch />
+        </section>
       ) : activeTab === 'donors' ? (
-        <DonorPortal />
+        <section className="networking-full-width">
+          <DonorPortal />
+        </section>
       ) : activeTab === 'faculty' ? (
-        <FacultyUpdate />
+        <section className="networking-full-width">
+          <FacultyUpdate />
+        </section>
       ) : (
-        <div className="grid grid-3" style={{ gridTemplateColumns: '2fr 1fr', gap: 'var(--spacing-xl)' }}>
-          {activeTab === 'profile' && (
-            <div style={{ gridColumn: '1 / 2' }}>
+        <section className="networking-main-grid">
+          <div className="networking-primary-column">
+            {activeTab === 'profile' ? (
               <ProfileUpload />
-            </div>
-          )}
-          
-          {activeTab === 'graph' && (
-            <div style={{ gridColumn: '1 / 2', minHeight: '500px' }}>
-              <NetworkGraph data={graphData} />
-            </div>
-          )}
-          
-          <div style={{ gridColumn: '2 / 3', display: 'flex', flexDirection: 'column', gap: 'var(--spacing-xl)' }}>
+            ) : (
+              <div className="network-graph-panel card">
+                <h3 className="card-title">Collaboration Graph</h3>
+                <p className="card-subtitle mb-3">
+                  Explore relationship pathways between students, faculty, and domain skills.
+                </p>
+                <div className="network-graph-canvas">
+                  <NetworkGraph data={graphData} />
+                </div>
+              </div>
+            )}
+          </div>
+
+          <aside className="networking-side-column">
             <Leaderboard />
-            <div style={{ height: '500px' }}>
+            <div className="networking-chat-shell">
               <NetworkChatbot onGraphUpdate={handleGraphUpdate} />
             </div>
-          </div>
-        </div>
+          </aside>
+        </section>
       )}
     </div>
-  );
-};
-
-export default Networking;
+  )
+}

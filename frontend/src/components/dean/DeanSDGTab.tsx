@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import SDGHeatmap from '../SDGHeatmap';
 import { SDGDistributionChart, SDGData } from '../AnalyticsCharts';
+import api from '../../services/api';
 import { 
   Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Tooltip 
 } from 'recharts';
@@ -21,11 +22,11 @@ export default function DeanSDGTab() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch('http://localhost:8000/api/v1/analytics/sdg/distribution');
-        const json = await res.json();
-        setSdgData(json);
+        const res = await api.get('/analytics/sdg/distribution');
+        setSdgData(Array.isArray(res.data) ? res.data : []);
       } catch (error) {
         console.error("Failed to fetch SDG data", error);
+        setSdgData([]);
       }
     };
 

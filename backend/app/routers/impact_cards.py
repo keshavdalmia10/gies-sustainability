@@ -20,7 +20,8 @@ from app.models_networking import Student
 router = APIRouter()
 
 
-@router.get("/", response_model=List[ImpactCard])
+@router.get("", response_model=List[ImpactCard])
+@router.get("/", response_model=List[ImpactCard], include_in_schema=False)
 async def list_impact_cards(
     sdg: Optional[int] = Query(None, ge=1, le=17),
     department: Optional[str] = None,
@@ -230,4 +231,3 @@ async def validate_impact_card(
     await db.commit()
     
     return {"message": "Validation recorded", "points_awarded": 10 if validation.status == 'approved' else 0}
-

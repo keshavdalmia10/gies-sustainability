@@ -1,0 +1,90 @@
+.mentor-card {
+  height: 100%;
+  display: grid;
+  gap: 0.85rem;
+  border-top: 4px solid var(--mentor-color, var(--color-primary));
+}
+
+.mentor-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.mentor-card-header h3 {
+  margin: 0 0 0.1rem;
+  font-size: 1.08rem;
+}
+
+.mentor-avatar {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.mentor-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.mentor-sdg {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.mentor-sdg .badge {
+  color: var(--color-text-dark);
+  background: color-mix(in srgb, var(--mentor-color, #0f766e) 18%, white);
+}
+
+.mentor-sdg p {
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+}
+
+.mentor-section h4 {
+  margin-bottom: 0.42rem;
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--color-text-muted);
+}
+
+.mentor-section ul {
+  margin: 0;
+  padding-left: 1rem;
+  display: grid;
+  gap: 0.3rem;
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+}
+
+.mentor-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.mentor-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.32rem;
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  padding: 0.23rem 0.55rem;
+  border-radius: var(--radius-pill);
+  background: rgba(var(--color-primary-rgb), 0.1);
+  color: var(--color-primary-dark);
+}
+
+.mentor-action {
+  margin-top: auto;
+}

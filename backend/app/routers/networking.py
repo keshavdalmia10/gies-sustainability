@@ -3,7 +3,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 from typing import List, Dict, Any
-import networkx as nx
 from app.database import get_db
 from app import models, models_networking, schemas_networking
 from uuid import UUID
@@ -88,6 +87,8 @@ async def update_faculty_skills(person_uuid: UUID, skills: List[str], db: AsyncS
 
 @router.get("/graph", response_model=schemas_networking.NetworkGraph)
 async def get_network_graph(db: AsyncSession = Depends(get_db)):
+    import networkx as nx
+
     G = nx.Graph()
     
     # Add Students

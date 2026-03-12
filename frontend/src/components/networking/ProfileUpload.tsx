@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import api from '../../services/api';
 
 const ProfileUpload: React.FC = () => {
   const [name, setName] = useState('');
@@ -13,12 +14,7 @@ const ProfileUpload: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch('http://localhost:8000/api/v1/networking/student', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      await api.post('/networking/student', {
           name,
           email,
           major,
@@ -26,25 +22,18 @@ const ProfileUpload: React.FC = () => {
           bio,
           skills: skills.split(',').map(s => s.trim()).filter(s => s),
           interests: interests.split(',').map(i => i.trim()).filter(i => i),
-        }),
       });
-
-      if (response.ok) {
-        setMessage('Profile created successfully!');
-        // Clear form
-        setName('');
-        setEmail('');
-        setMajor('');
-        setYear('');
-        setBio('');
-        setSkills('');
-        setInterests('');
-      } else {
-        const errorData = await response.json();
-        setMessage(`Error: ${errorData.detail || 'Failed to create profile'}`);
-      }
-    } catch (error) {
-      setMessage('Error connecting to server');
+      setMessage('Profile created successfully!');
+      // Clear form
+      setName('');
+      setEmail('');
+      setMajor('');
+      setYear('');
+      setBio('');
+      setSkills('');
+      setInterests('');
+    } catch (error: any) {
+      setMessage(`Error: ${error?.response?.data?.detail || 'Failed to create profile'}`);
     }
   };
 

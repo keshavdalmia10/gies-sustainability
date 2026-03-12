@@ -1,113 +1,187 @@
 import { Link } from 'react-router-dom'
-import { Users, DollarSign, GraduationCap } from 'lucide-react'
-import './HomePage.css'
+import {
+  ArrowRight,
+  CheckCircle2,
+  Database,
+  DollarSign,
+  GraduationCap,
+  ShieldCheck,
+  Sparkles,
+  Users,
+} from 'lucide-react'
 import NewsFeed from '../components/news/NewsFeed'
+import './HomePage.css'
+
+const HERO_STATS = [
+  { value: '6', label: 'Integrated Research Sources', note: 'Google Scholar, Scopus, WoS, NIH, NSF, USPTO' },
+  { value: '1,500+', label: 'Publications Indexed', note: 'Unified in one queryable model' },
+  { value: '85+', label: 'Faculty Profiles', note: 'Cross-linked to grants, patents, outcomes' },
+  { value: '98%', label: 'Community Confidence', note: 'Human-in-the-loop validation feedback' },
+]
+
+const PERSONA_CARDS = [
+  {
+    to: '/dean',
+    icon: Users,
+    title: 'Dean / Provost',
+    summary: 'Prioritize hiring, funding, and strategy with SDG momentum, gaps, and confidence context.',
+    points: ['Portfolio shape by SDG', 'Department-level gaps', 'Action-ready recommendations'],
+    cta: 'Open strategic dashboard',
+    tone: 'dean',
+  },
+  {
+    to: '/donor',
+    icon: DollarSign,
+    title: 'Donor / Funder',
+    summary: 'Explore evidence-backed impact cards with funding gaps and clear next actions.',
+    points: ['Story + evidence in one card', 'Funding need transparency', 'Real-world outcomes and geography'],
+    cta: 'Discover funding opportunities',
+    tone: 'donor',
+  },
+  {
+    to: '/student',
+    icon: GraduationCap,
+    title: 'Student',
+    summary: 'Find faculty mentors by SDG focus, active projects, and opportunities to contribute.',
+    points: ['SDG-filtered mentor discovery', 'Project and lab visibility', 'Direct contact pathways'],
+    cta: 'Find your mentor match',
+    tone: 'student',
+  },
+]
 
 export default function HomePage() {
   return (
-    <div className="home-page">
-      {/* Hero Section */}
-      <section className="hero">
-        <div className="container">
-          <h1 className="hero-title fade-in">
-            Gies Sustainability Impact Dashboard
-          </h1>
-          <p className="hero-subtitle fade-in">
-            From Data to Decisions: Transforming research into measurable impact for UN SDG goals
+    <div className="home-page page-shell">
+      <section className="hero-block">
+        <div className="container hero-grid">
+          <div className="hero-copy">
+            <span className="eyebrow">
+              <Sparkles size={12} /> From Papers to Proof
+            </span>
+            <h1 className="hero-title">Sustainability impact intelligence for leaders, donors, and students.</h1>
+            <p className="hero-subtitle">
+              The dashboard links publications to verified outcomes, confidence signals, and funding actions so
+              research decisions are faster and more defensible.
+            </p>
+
+            <div className="hero-actions">
+              <Link to="/dean" className="btn btn-primary">
+                Start with Dean View <ArrowRight size={16} />
+              </Link>
+              <Link to="/donor" className="btn btn-outline">
+                View Impact Portfolio
+              </Link>
+            </div>
+          </div>
+
+          <div className="hero-panel card fade-in">
+            <h2 className="hero-panel-title">Where trust comes from</h2>
+            <ul className="hero-panel-list" aria-label="Trust architecture">
+              <li>
+                <Database size={16} />
+                <div>
+                  <strong>Source transparency</strong>
+                  <span>Every metric maps to its data origin and update cadence.</span>
+                </div>
+              </li>
+              <li>
+                <ShieldCheck size={16} />
+                <div>
+                  <strong>Human verification loop</strong>
+                  <span>Faculty and admins can flag, review, and approve corrections.</span>
+                </div>
+              </li>
+              <li>
+                <CheckCircle2 size={16} />
+                <div>
+                  <strong>Explainable confidence</strong>
+                  <span>Impact scores include factor-level rationale for each linkage.</span>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section className="container">
+        <div className="hero-stats-grid">
+          {HERO_STATS.map((stat, index) => (
+            <article key={stat.label} className="hero-stat-card card" style={{ animationDelay: `${index * 70}ms` }}>
+              <p className="hero-stat-value">{stat.value}</p>
+              <p className="hero-stat-label">{stat.label}</p>
+              <p className="hero-stat-note">{stat.note}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="container">
+        <div className="section-head">
+          <h2>Choose Your Decision Lens</h2>
+          <p className="lead">
+            Each view surfaces role-specific decisions while sharing one common data and verification backbone.
           </p>
-          
-          <div className="hero-stats grid grid-3 fade-in">
-            <div className="stat-card card">
-              <div className="stat-number">85+</div>
-              <div className="stat-label">Faculty Researchers</div>
+        </div>
+
+        <div className="persona-grid">
+          {PERSONA_CARDS.map((persona) => {
+            const Icon = persona.icon
+            return (
+              <Link key={persona.to} to={persona.to} className={`persona-card card persona-${persona.tone}`}>
+                <div className="persona-icon-wrap">
+                  <Icon size={22} />
+                </div>
+                <h3 className="persona-title">{persona.title}</h3>
+                <p className="persona-description">{persona.summary}</p>
+                <ul className="persona-list" aria-label={`${persona.title} features`}>
+                  {persona.points.map((item) => (
+                    <li key={item}>
+                      <CheckCircle2 size={14} /> {item}
+                    </li>
+                  ))}
+                </ul>
+                <span className="persona-cta">
+                  {persona.cta}
+                  <ArrowRight size={15} />
+                </span>
+              </Link>
+            )
+          })}
+        </div>
+      </section>
+
+      <section className="container">
+        <div className="status-quo card">
+          <h2>Before vs After</h2>
+          <p className="lead mb-4">
+            The platform moves stakeholders from fragmented manual research to transparent, decision-ready insight.
+          </p>
+          <div className="status-grid">
+            <div className="status-column status-before">
+              <h3>Before</h3>
+              <ul>
+                <li>Research data scattered across disconnected sources.</li>
+                <li>Impact claims difficult to verify and compare.</li>
+                <li>Strategic funding conversations rely on anecdotal evidence.</li>
+              </ul>
             </div>
-            <div className="stat-card card">
-              <div className="stat-number">1,500+</div>
-              <div className="stat-label">Publications</div>
-            </div>
-            <div className="stat-card card">
-              <div className="stat-number">$15M+</div>
-              <div className="stat-label">Research Funding</div>
+            <div className="status-column status-after">
+              <h3>After</h3>
+              <ul>
+                <li>Unified ingestion from major academic and funding databases.</li>
+                <li>Evidence drawers + confidence context on every impact narrative.</li>
+                <li>Role-specific workflows for allocation, donor matching, and mentorship.</li>
+              </ul>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Persona Selection */}
-      <section className="personas container">
-        <h2 className="text-center mb-4">Choose Your View</h2>
-        
-        <div className="persona-grid">
-          <Link to="/dean" className="persona-card card">
-            <div className="persona-icon">
-              <Users size={48} />
-            </div>
-            <h3 className="persona-title">Dean / Provost</h3>
-            <p className="persona-description">
-              Strategic gaps analysis, SDG momentum tracking, and resource allocation insights
-            </p>
-            <div className="persona-features">
-              <div className="feature-item">✓ SDG × Department Matrix</div>
-              <div className="feature-item">✓ Momentum Indicators</div>
-              <div className="feature-item">✓ Gap Analysis</div>
-            </div>
-            <button className="btn btn-primary">View Dashboard →</button>
-          </Link>
-
-          <Link to="/donor" className="persona-card card">
-            <div className="persona-icon donor">
-              <DollarSign size={48} />
-            </div>
-            <h3 className="persona-title">Donor / Funder</h3>
-            <p className="persona-description">
-              Impact cards showcasing research outcomes, funding opportunities, and community reach
-            </p>
-            <div className="persona-features">
-              <div className="feature-item">✓ Impact Stories</div>
-              <div className="feature-item">✓ Funding Gaps</div>
-              <div className="feature-item">✓ Real-World Outcomes</div>
-            </div>
-            <button className="btn btn-secondary">Explore Opportunities →</button>
-          </Link>
-
-          <Link to="/student" className="persona-card card">
-            <div className="persona-icon student">
-              <GraduationCap size={48} />
-            </div>
-            <h3 className="persona-title">Student</h3>
-            <p className="persona-description">
-              Find faculty mentors working on sustainability challenges aligned with your interests
-            </p>
-            <div className="persona-features">
-              <div className="feature-item">✓ Faculty Search</div>
-              <div className="feature-item">✓ Research Profiles</div>
-              <div className="feature-item">✓ Connect with Mentors</div>
-            </div>
-            <button className="btn btn-outline">Find Mentors →</button>
-          </Link>
+      <section className="container news-section">
+        <div className="section-head">
+          <h2>Global SDG Signal Feed</h2>
+          <p className="lead mb-0">Recent SDG developments and AI-curated opportunities to inform strategy.</p>
         </div>
-      </section>
-
-      {/* Mission Statement */}
-      <section className="mission container">
-        <div className="card mission-card">
-          <h2>Our Mission</h2>
-          <p>
-            The Gies Sustainability Impact Dashboard transforms research data into actionable insights
-            for decision-makers. By linking faculty publications to real-world impacts—grants, patents,
-            policies, and community outcomes—we demonstrate how Gies College research advances the
-            UN Sustainable Development Goals.
-          </p>
-          <p>
-            <strong>Pillar 2: From Data to Decisions</strong> - This dashboard empowers deans to allocate
-            resources strategically, enables donors to fund high-impact research, and helps students
-            find mentors working on sustainability challenges that matter.
-          </p>
-        </div>
-      </section>
-
-      {/* News Section */}
-      <section className="news-section container mt-12 mb-12">
         <NewsFeed />
       </section>
     </div>

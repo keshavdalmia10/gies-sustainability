@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Search, ExternalLink, Building, Globe, Mail } from 'lucide-react';
+import api from '../../services/api';
 
 interface DonorMatch {
   name: string;
@@ -23,22 +24,11 @@ const DonorSearch: React.FC = () => {
     setMatches([]); // Clear previous results
     
     try {
-      const response = await fetch('http://localhost:8000/api/v1/donors/search', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ project_description: description }),
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        setMatches(data.matches);
-      } else {
-        console.error('Failed to fetch donors');
-      }
+      const response = await api.post('/donors/search', { project_description: description });
+      setMatches(Array.isArray(response.data?.matches) ? response.data.matches : []);
     } catch (error) {
       console.error('Error:', error);
+      setMatches([]);
     } finally {
       setLoading(false);
     }

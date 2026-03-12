@@ -1,4 +1,3 @@
-import React from 'react';
 
 // Mock Data Structure for Heatmap
 // Rows: Departments
@@ -9,14 +8,6 @@ interface HeatmapData {
   department: string;
   scores: { [sdg: number]: number };
 }
-
-const DEPARTMENTS = [
-  "Finance",
-  "Accountancy",
-  "Business Admin",
-  "Economics",
-  "Marketing"
-];
 
 const MOCK_HEATMAP_DATA: HeatmapData[] = [
   {

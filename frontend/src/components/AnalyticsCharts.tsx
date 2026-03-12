@@ -122,7 +122,7 @@ export const SDGDistributionChart: React.FC<{ data: SDGData[] }> = ({ data }) =>
         <YAxis />
         <Tooltip />
         <Bar dataKey="count" name="Articles">
-          {data.map((entry, index) => (
+          {data.map((_, index) => (
             <Cell key={`cell-${index}`} fill={SDG_COLORS[index % SDG_COLORS.length]} />
           ))}
         </Bar>

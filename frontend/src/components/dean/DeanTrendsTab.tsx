@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { PublicationTrendChart, TrendData } from '../AnalyticsCharts';
+import api from '../../services/api';
 
 export default function DeanTrendsTab() {
   const [trendData, setTrendData] = useState<TrendData[]>([]);
@@ -7,11 +8,11 @@ export default function DeanTrendsTab() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch('http://localhost:8000/api/v1/analytics/trends/publications');
-        const json = await res.json();
-        setTrendData(json);
+        const res = await api.get('/analytics/trends/publications');
+        setTrendData(Array.isArray(res.data) ? res.data : []);
       } catch (error) {
         console.error("Failed to fetch trend data", error);
+        setTrendData([]);
       }
     };
 
