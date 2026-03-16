@@ -1,706 +1,543 @@
 # Gies Sustainability Impact Dashboard
-## AI-Powered Research Impact Linkage Engine
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![React 18](https://img.shields.io/badge/react-18.0+-61dafb.svg)](https://reactjs.org/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-009688.svg)](https://fastapi.tiangolo.com/)
+The Gies Sustainability Impact Dashboard is a multi-persona web application for turning scattered research activity into decision-ready sustainability insight.
 
----
+It combines a React frontend, a FastAPI backend, PostgreSQL-backed analytics, AI-assisted matching workflows, and a production deployment on DigitalOcean. The product is designed for four main audiences:
 
-## 📋 Table of Contents
+- Leadership teams that need portfolio-level visibility.
+- Donors and funders that need credible impact stories and funding opportunities.
+- Students that need mentor and project discovery.
+- Faculty and administrators that need collaboration, profile updates, and validation workflows.
 
-- [Overview](#overview)
-- [Problem Statement](#problem-statement)
-- [Solution](#solution)
-- [Key Features](#key-features)
-- [Architecture](#architecture)
-- [Technology Stack](#technology-stack)
-- [Installation](#installation)
-- [Usage](#usage)
-- [API Documentation](#api-documentation)
-- [Project Structure](#project-structure)
-- [AI/ML Pipeline](#aiml-pipeline)
-- [Contributing](#contributing)
-- [License](#license)
+## Why This Project Exists
 
----
+Universities are usually strong at storing publications and weak at explaining why those publications matter operationally.
 
-## 🎯 Overview
+This project exists to solve five recurring problems:
 
-The **Gies Sustainability Impact Dashboard** is an intelligent analytics platform that transforms sustainability research tracking from a simple publication database into a comprehensive **decision engine** for university leadership, donors, and students. The system automatically links faculty research publications to real-world outcomes including grants, patents, policies, and measurable societal impact.
+- Research impact is hard to explain beyond publication counts.
+- Donor conversations stall when there is no clear evidence trail from research to outcomes.
+- Leadership teams struggle to compare departments, SDGs, and momentum in one place.
+- Students often cannot find the right faculty, projects, or skills network quickly enough.
+- Sustainability data is fragmented across publications, grants, patents, policy references, and manually maintained narratives.
 
-### What Makes This Unique?
+The dashboard addresses that by giving each audience a focused decision surface while keeping the data model shared underneath.
 
-- **AI-Powered Impact Linking**: Automatically connects research publications to grants, patents, and policy documents using GPT-4 and semantic similarity
-- **Multi-Persona Decision Support**: Tailored views for Deans (strategic planning), Donors (funding opportunities), and Students (collaboration matching)
-- **Real-World Outcome Tracking**: Measures tangible impact like jobs created, communities reached, and funding secured
-- **Automated Narrative Generation**: Creates compelling impact stories from raw data using LLM technology
+## Product Summary
 
----
+At a high level, the platform does six things:
 
-## 🔍 Problem Statement
+- Aggregates faculty, publication, impact, and networking data into one application database.
+- Presents role-specific dashboards instead of one generic research portal.
+- Links published research to structured impact cards and supporting evidence.
+- Exposes analytics endpoints for leadership reporting and portfolio review.
+- Supports AI-assisted donor matching, project discovery, news summarization, and network analysis.
+- Adds lightweight trust mechanisms such as validation, leaderboards, and visible evidence context.
 
-Universities face critical challenges in demonstrating research impact:
+## Feature Matrix
 
-### Pain Point #1: Proving Impact to Donors
-**The Problem**: When donors ask "What real-world impact came from our sustainability research?", institutions can show publications but struggle to demonstrate:
-- Jobs created
-- Policies influenced
-- Communities impacted
-- Commercial innovations
+The table below is the quickest way to understand the product, the reason each feature exists, and the main tech used to deliver it.
 
-**Why It's Hard**: Impact data is scattered across NIH grants, USPTO patents, state agency reports, and other disconnected sources. Manual linking is time-consuming and error-prone.
+| Area | Functionality | Why it exists | Main tech |
+| --- | --- | --- | --- |
+| Home page | Persona routing, trust framing, SDG news feed, before/after story | Helps a new user understand the product quickly and self-select into the right workflow | React, React Router, Lucide icons, NewsAPI fallback logic, OpenAI news insight generation |
+| Dean view | Summary KPIs, publication trends, department comparison, SDG distribution, top faculty analysis | Gives leadership a compact strategic dashboard for allocation, hiring, and portfolio review | React, Recharts, FastAPI analytics endpoints, PostgreSQL aggregations |
+| Donor view | Published impact card browsing, SDG filtering, funding gap visibility, evidence CTA | Makes fundraising more concrete by turning research into investable narratives | React, Axios, FastAPI impact-card endpoints, PostgreSQL impact-card storage |
+| Impact card validation | Approve or reject impact evidence and award student points | Introduces a human verification loop so trust does not depend only on AI output | FastAPI, PostgreSQL, gamification endpoints |
+| Student view | SDG filtering, mentor discovery UI, project-oriented search | Lowers the friction for students trying to find relevant faculty and work | React, local demo dataset, reusable mentor cards |
+| Networking hub | Student profile creation, graph exploration, AI network assistant, donor/project matching, faculty updates | Moves the product from static reporting into active collaboration and opportunity discovery | React, FastAPI, NetworkX, LangGraph, OpenAI, PostgreSQL networking tables |
+| Faculty API | Faculty listing, profile retrieval, updates, publication drill-down | Enables profile management and supports student, donor, and analytics workflows | FastAPI, SQLAlchemy, PostgreSQL |
+| News feed | SDG news retrieval plus AI-generated research opportunity text | Keeps the platform connected to external sustainability signals instead of only internal data | FastAPI, httpx, NewsAPI, OpenAI |
+| Production deployment | Containerized frontend and backend, managed database, App Platform routing | Makes the system accessible without local setup and gives it a repeatable deployment path | Docker, Nginx, DigitalOcean App Platform, DigitalOcean Managed PostgreSQL, DOCR |
 
-### Pain Point #2: Student Collaboration Discovery
-**The Problem**: Students want to work on sustainability projects but don't know:
-- Which faculty are actively working in their area of interest
-- What skills are needed for specific projects
-- How to effectively reach out to potential mentors
+## Feature Deep Dive
 
-**Why It's Hard**: Traditional dashboards show *who publishes on what topics* but can't answer *"Who should I collaborate with?"* or provide personalized networking advice.
+### 1. Home and Orientation
 
-### Pain Point #3: Strategic Decision-Making for Leadership
-**The Problem**: Deans and provosts need to make strategic investment decisions but lack:
-- Clear visibility into research strengths and gaps across SDG goals
-- Metrics for comparing departmental sustainability contributions
-- Data-driven insights for resource allocation
+The landing page is not just marketing copy. It is a product router for different decision-makers.
 
----
+What it does:
 
-## 💡 Solution
+- Introduces the "From Papers to Proof" framing.
+- Shows trust-building ideas such as source transparency, human validation, and explainable confidence.
+- Routes users into Dean, Donor, and Student journeys.
+- Displays an SDG news feed with AI-generated research opportunity commentary.
 
-The Gies Sustainability Impact Dashboard solves these problems through an **AI-powered Impact Linkage Engine** that:
+Why it exists:
 
-### 1. Automated Impact Discovery
-- **Integrates 6+ external data sources**: NIH RePORTER, NSF Awards, USPTO PatentsView, Google Scholar, Scopus, Web of Science
-- **AI-powered matching**: Uses GPT-4 and sentence-transformers to semantically link publications to grants, patents, and policies
-- **Confidence scoring**: Multi-modal scoring (semantic similarity + keyword matching + temporal validation + author verification) with 85%+ precision
+- Multi-persona products fail when the first screen is generic.
+- Users need a fast explanation of what this system is for before they trust any downstream analytics.
+- External sustainability signals help the product feel current instead of static.
 
-### 2. Intelligent Narrative Generation
-- **Impact Cards**: Auto-generated one-pagers for each faculty member showing research → outcomes → real-world impact
-- **LLM-powered storytelling**: GPT-4 creates compelling narratives from raw data
-- **Evidence-backed**: Every claim linked to verifiable sources (grants, patents, policy documents)
+Tech used:
 
-### 3. AI Networking Agent
-- **Skill extraction**: Understands student needs beyond simple keyword matching
-- **Smart matching**: Connects students with faculty and peers based on skills, interests, and active projects
-- **Personalized advice**: Generates contextual outreach suggestions using LangGraph workflows
+- [App.tsx](/Users/keshavdalmia/Documents/case_competition/frontend/src/App.tsx)
+- [HomePage.tsx](/Users/keshavdalmia/Documents/case_competition/frontend/src/pages/HomePage.tsx)
+- [NewsFeed.tsx](/Users/keshavdalmia/Documents/case_competition/frontend/src/components/news/NewsFeed.tsx)
+- [news.py](/Users/keshavdalmia/Documents/case_competition/backend/app/routers/news.py)
 
-### 4. Data Quality Assurance
-- **Impact Detective**: Gamified validation system where staff review AI suggestions
-- **Human-in-the-loop**: Medium-confidence links require human validation
-- **Continuous learning**: AI improves from corrections over time
+### 2. Dean / Leadership Dashboard
 
----
+The Dean workflow is the most analytics-heavy area of the app.
 
-## ✨ Key Features
+What it does:
 
-### For Donors
-- **Filterable Impact Cards**: Browse by SDG, region, outcome type (jobs/policy/startups)
-- **Funding Gap Analysis**: See exactly where additional funding is needed
-- **Outcome Metrics**: Jobs created, communities reached, policies influenced
-- **Direct Contact**: One-click connection to advancement office
+- Pulls summary metrics such as publications, faculty, departments, and SDG coverage.
+- Renders publication momentum over time.
+- Compares departmental output and sustainability contribution.
+- Shows SDG mix and faculty influence views.
+- Normalizes inconsistent API payload shapes so the UI can tolerate backend shape variation.
 
-### For Deans & Leadership
-- **SDG × Department Heatmap**: Visual gap analysis across sustainability goals
-- **Momentum Indicators**: Publication growth, grant capture rates, collaboration trends
-- **Peer Benchmarking**: Compare against similar institutions
-- **Strategic Investment Insights**: Data-driven recommendations for resource allocation
+Why it exists:
 
-### For Students
-- **AI Mentor Matching**: Find faculty based on research interests and skills needed
-- **Active Project Discovery**: See ongoing projects looking for team members
-- **Personalized Outreach**: Get AI-generated advice on how to make first contact
-- **Network Visualization**: Interactive graphs showing collaboration opportunities
+- Leadership decisions need comparability more than raw detail.
+- Department heads and provost teams need to spot concentration, gaps, and trend direction quickly.
+- The dashboard makes it easier to justify resource allocation with visible evidence instead of anecdote.
 
-### For Faculty
-- **Impact Recognition**: Automated tracking of research outcomes
-- **Feedback Loop**: Suggest corrections or add missing impacts
-- **Collaboration Discovery**: Find peers working on similar sustainability challenges
-- **Privacy Controls**: Opt-out options and data governance
+Tech used:
 
----
+- [DeanInteractiveDashboard.tsx](/Users/keshavdalmia/Documents/case_competition/frontend/src/components/dean/DeanInteractiveDashboard.tsx)
+- [analytics.py](/Users/keshavdalmia/Documents/case_competition/backend/app/routers/analytics.py)
+- Recharts for bar, area, pie, and scatter visualizations
+- Async SQLAlchemy queries for aggregation against PostgreSQL
 
-## 🏗️ Architecture
+### 3. Donor and Funder Experience
 
-### System Architecture Overview
+The donor workflow centers the impact card as the core funding object.
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                     DATA INGESTION LAYER                         │
-├─────────────────────────────────────────────────────────────────┤
-│  Illinois Experts API │ NIH RePORTER │ NSF Awards │ USPTO       │
-│  Google Scholar │ Scopus │ Web of Science │ State Agencies      │
-└────────────────────────┬────────────────────────────────────────┘
-                         │
-                         ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                  DATA PROCESSING & STORAGE                       │
-├─────────────────────────────────────────────────────────────────┤
-│  PostgreSQL (16 tables)  │  Vector DB (Pinecone/FAISS)          │
-│  Redis Cache             │  Audit Logs                          │
-└────────────────────────┬────────────────────────────────────────┘
-                         │
-                         ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                      AI/ML PIPELINE                              │
-├─────────────────────────────────────────────────────────────────┤
-│  ┌──────────────────┐  ┌──────────────────┐  ┌──────────────┐ │
-│  │ SDG Classifier   │  │ Impact Matcher   │  │ Card         │ │
-│  │ (GPT-4 +         │→ │ (Multi-modal     │→ │ Generator    │ │
-│  │  Transformers)   │  │  Similarity)     │  │ (GPT-4)      │ │
-│  └──────────────────┘  └──────────────────┘  └──────────────┘ │
-└────────────────────────┬────────────────────────────────────────┘
-                         │
-                         ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                    DECISION SUPPORT LAYER                        │
-├─────────────────────────────────────────────────────────────────┤
-│  Dean/Provost View  │  Donor View  │  Student Networking        │
-│  Strategic Gaps     │  Impact Cards │  AI Mentor Matching       │
-└────────────────────────┬────────────────────────────────────────┘
-                         │
-                         ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                    FRONTEND (React + TypeScript)                 │
-├─────────────────────────────────────────────────────────────────┤
-│  Interactive Dashboard │ Real-time Filtering │ Visualizations   │
-└─────────────────────────────────────────────────────────────────┘
-```
+What it does:
 
-### Database Schema
+- Lists published impact cards.
+- Filters cards by SDG.
+- Surfaces current funding and open funding gaps.
+- Shows geography and key outcomes.
+- Links to a more detailed evidence-story view.
 
-**16 PostgreSQL Tables**:
-- **Core Entities**: `faculty`, `publications`, `impacts`, `grants`, `patents`, `policies`
-- **Linkage Tables**: `publication_impact_links`, `faculty_impact_links`
-- **Impact Cards**: `impact_cards` (generated narratives)
-- **Evaluation**: `ground_truth_set`, `model_evaluations`
-- **Governance**: `faculty_feedback`, `data_retention_policies`
-- **Networking**: `student_profiles`, `team_projects`, `skill_tags`
+Why it exists:
 
-**Vector Database** (Pinecone/FAISS):
-- Publication embeddings (768-dim sentence-transformers)
-- Impact embeddings (grants, patents, policies)
-- SDG description embeddings
+- Donors fund stories with traceable outcomes, not raw publication tables.
+- Funding gap visibility helps move from passive browsing to action.
+- A donor-friendly surface lets the same research data support advancement conversations without needing a custom report every time.
 
----
+Tech used:
 
-## 🛠️ Technology Stack
+- [DonorView.tsx](/Users/keshavdalmia/Documents/case_competition/frontend/src/pages/DonorView.tsx)
+- [impact_cards.py](/Users/keshavdalmia/Documents/case_competition/backend/app/routers/impact_cards.py)
+- PostgreSQL-backed `impact_cards` records
+- Axios client in [api.ts](/Users/keshavdalmia/Documents/case_competition/frontend/src/services/api.ts)
 
-### Backend
-- **Framework**: FastAPI (Python 3.10+)
-- **Database**: PostgreSQL 15 with SQLAlchemy ORM
-- **Vector DB**: Pinecone (cloud) or FAISS (local)
-- **Cache**: Redis
-- **AI/ML**: 
-  - OpenAI GPT-4 (classification, narrative generation)
-  - Sentence-transformers (`all-mpnet-base-v2`)
-  - LangGraph (AI agent workflows)
-- **External APIs**: NIH RePORTER, NSF Awards, USPTO PatentsView
+Implementation note:
+
+- The donor listing page is live and database-backed.
+- The detailed impact-card page in [ImpactCardDetail.tsx](/Users/keshavdalmia/Documents/case_competition/frontend/src/pages/ImpactCardDetail.tsx) is currently a UI preview built on mock data, even though the backend already exposes a detailed impact-card endpoint.
+
+### 4. Student Discovery
+
+The student-facing view is intentionally simpler than the networking hub.
+
+What it does:
+
+- Lets users filter mentors by SDG.
+- Supports text search across faculty names and active project labels.
+- Presents opportunities in a mentor-card format.
+
+Why it exists:
+
+- Students often need a lightweight browsing surface before they are ready for deeper network tooling.
+- A direct mentor discovery experience reduces the intimidation of navigating a full research graph.
+
+Tech used:
+
+- [StudentView.tsx](/Users/keshavdalmia/Documents/case_competition/frontend/src/pages/StudentView.tsx)
+- [MentorCard.tsx](/Users/keshavdalmia/Documents/case_competition/frontend/src/components/MentorCard.tsx)
+
+Implementation note:
+
+- The current student page uses a frontend mock mentor dataset rather than live API data.
+- The more dynamic student and networking features live in the Networking hub and backend networking endpoints.
+
+### 5. Networking and Collaboration Hub
+
+The Networking page is where the project becomes an active matching system instead of only a reporting dashboard.
+
+What it does:
+
+- Creates student profiles with major, year, skills, interests, and bio.
+- Stores and updates networking entities in PostgreSQL.
+- Builds a graph of students, faculty, skills, and interests.
+- Provides an AI assistant that analyzes relationship patterns and returns suggested connections plus graph data.
+- Supports donor-side project matching and faculty-side updates.
+- Displays a gamified leaderboard based on student impact points.
+
+Why it exists:
+
+- Research ecosystems are networks, not flat lists.
+- Faculty discovery, donor matching, and student engagement all improve when skills and interests become first-class objects.
+- The AI assistant adds a conversational way to explore the network without requiring every user to understand graph structures.
+
+Tech used:
+
+- [Networking.tsx](/Users/keshavdalmia/Documents/case_competition/frontend/src/pages/Networking.tsx)
+- [ProfileUpload.tsx](/Users/keshavdalmia/Documents/case_competition/frontend/src/components/networking/ProfileUpload.tsx)
+- [NetworkChatbot.tsx](/Users/keshavdalmia/Documents/case_competition/frontend/src/components/networking/NetworkChatbot.tsx)
+- [NetworkGraph.tsx](/Users/keshavdalmia/Documents/case_competition/frontend/src/components/networking/NetworkGraph.tsx)
+- [networking.py](/Users/keshavdalmia/Documents/case_competition/backend/app/routers/networking.py)
+- [gamification.py](/Users/keshavdalmia/Documents/case_competition/backend/app/routers/gamification.py)
+- NetworkX, LangGraph, LangChain OpenAI, OpenAI, react-force-graph-2d
+
+### 6. AI-Assisted Donor Matching
+
+There are two complementary donor discovery tools inside the networking hub.
+
+What they do:
+
+- `Find Funding` takes a project description and returns donor matches with rationale.
+- `For Donors` takes a donor interest and returns faculty or project matches.
+
+Why they exist:
+
+- Funding search is often performed manually across disconnected foundation and grant sources.
+- Donors also need a way to start from their thematic priorities and discover internal opportunities worth supporting.
+
+Tech used:
+
+- [DonorSearch.tsx](/Users/keshavdalmia/Documents/case_competition/frontend/src/components/networking/DonorSearch.tsx)
+- [DonorPortal.tsx](/Users/keshavdalmia/Documents/case_competition/frontend/src/components/networking/DonorPortal.tsx)
+- [donors.py](/Users/keshavdalmia/Documents/case_competition/backend/app/routers/donors.py)
+- LangChain OpenAI with `gpt-4o`
+
+Implementation note:
+
+- These workflows depend on `OPENAI_API_KEY`.
+- They are AI-assisted matching tools, not authoritative grant databases.
+
+### 7. Validation and Gamification
+
+The platform includes a lightweight quality-control loop.
+
+What it does:
+
+- Allows impact-card validation submissions.
+- Awards points to students when validations are approved.
+- Exposes a leaderboard of the most active contributors.
+
+Why it exists:
+
+- Systems like this need incentives for human review.
+- Validation activity converts trust into a measurable behavior rather than an abstract promise.
+
+Tech used:
+
+- [impact_cards.py](/Users/keshavdalmia/Documents/case_competition/backend/app/routers/impact_cards.py)
+- [gamification.py](/Users/keshavdalmia/Documents/case_competition/backend/app/routers/gamification.py)
+- `students` table plus impact point fields
+
+## Current Feature Status
+
+This is important because not every surface is equally mature.
+
+### Live and database-backed
+
+- Home page news feed
+- Dean analytics dashboard
+- Donor impact-card listing
+- Faculty CRUD and publication drill-down
+- Student profile creation
+- Networking graph generation
+- AI network analysis
+- Donor matching endpoints
+- Leaderboard and validation point tracking
+
+### Present in the UI but partially mocked or demo-oriented
+
+- Student mentor browsing page
+- Impact-card detail page preview
+
+### Present in the data model or broader repo but not part of the lean production runtime
+
+- Some extended research/ML ingestion modules
+- Additional routers outside the runtime app
+- Older Terraform infrastructure files under `infra/terraform`
+
+## System Architecture
 
 ### Frontend
-- **Framework**: React 18 + TypeScript
-- **Build Tool**: Vite
-- **Routing**: React Router v6
-- **HTTP Client**: Axios
-- **Styling**: Modern CSS with responsive design
-- **Visualizations**: D3.js, Chart.js
 
-### DevOps
-- **Containerization**: Docker + Docker Compose
-- **Testing**: Pytest (backend), Jest (frontend)
-- **CI/CD**: GitHub Actions (ready)
-- **Monitoring**: Application logs, performance metrics
+- Single-page React application with persona-specific routes.
+- Vite-based build for local development.
+- Nginx-served static build in production.
 
----
+### Backend
 
-## 📦 Installation
+- Lean FastAPI runtime in [runtime_app.py](/Users/keshavdalmia/Documents/case_competition/backend/app/runtime_app.py).
+- Async PostgreSQL access through SQLAlchemy.
+- Router-based API surface for analytics, donors, faculty, gamification, impact cards, networking, and news.
 
-### Prerequisites
-- Python 3.10+
-- Node.js 18+
-- PostgreSQL 15+
-- Redis (optional, for caching)
-- OpenAI API key
+### Data Layer
 
-### Quick Start (Automated)
+- PostgreSQL is the source of truth for faculty, publications, impacts, cards, students, skills, and interests.
+- Relationship tables model network links between people and topics.
 
-```bash
-# Clone the repository
-git clone <repository-url>
-cd case_competition
+### AI Layer
 
-# Run the automated setup script
-chmod +x setup_mvp.sh
-./setup_mvp.sh
+- OpenAI powers donor matching, article insight generation, and networking analysis responses.
+- LangGraph and LangChain orchestrate parts of the networking assistant flow.
+- NetworkX constructs graph structures for collaboration analysis.
 
-# Start the application
-chmod +x start_mvp.sh
-./start_mvp.sh
+### Deployment Layer
+
+- Frontend and backend are containerized separately.
+- DigitalOcean App Platform runs both services.
+- DigitalOcean Managed PostgreSQL stores application data.
+- DigitalOcean Container Registry stores deployment images.
+
+## Data Model and Why It Matters
+
+The database is structured around both research output and people/network data.
+
+### Core research tables
+
+- `faculty`: who the institution can activate, analyze, or feature.
+- `publications`: the base record for research output and SDG alignment.
+- `impacts`: downstream outcomes such as grants, patents, and policies.
+- `impact_cards`: donor-friendly narratives and summary objects.
+- `publication_impact_links`: the evidence layer between papers and outcomes.
+
+Why these exist:
+
+- They let the product move from "who published what" to "what changed because of the work."
+
+### Funding and evidence specialization tables
+
+- `grants`
+- `patents`
+- `policies`
+- `faculty_impact_links`
+- `ground_truth_set`
+- `model_evaluations`
+- `faculty_feedback`
+- `audit_logs`
+
+Why these exist:
+
+- They support explainability, governance, and ML evaluation rather than just CRUD operations.
+
+### Networking tables
+
+- `students`
+- `skills`
+- `interests`
+- `student_skills`
+- `student_interests`
+- `faculty_skills`
+- `faculty_interests`
+
+Why these exist:
+
+- They make collaboration and matchmaking possible without flattening everyone into a single profile blob.
+
+## API Surface
+
+The production runtime currently mounts these main route families:
+
+### Analytics
+
+- `/api/v1/analytics/summary`
+- `/api/v1/analytics/departments`
+- `/api/v1/analytics/trends/publications`
+- `/api/v1/analytics/faculty/top`
+- `/api/v1/analytics/sdg/distribution`
+
+### Impact cards
+
+- `/api/v1/impact-cards/`
+- `/api/v1/impact-cards/{card_id}`
+- `/api/v1/impact-cards/{card_id}/publish`
+- `/api/v1/impact-cards/{card_id}/validate`
+
+### Faculty
+
+- `/api/v1/faculty/`
+- `/api/v1/faculty/{faculty_id}`
+- `/api/v1/faculty/{faculty_id}/publications`
+
+### Networking
+
+- `/api/v1/networking/student`
+- `/api/v1/networking/faculty/{person_uuid}/skills`
+- `/api/v1/networking/graph`
+- `/api/v1/networking/analyze`
+
+### Donors
+
+- `/api/v1/donors/search`
+- `/api/v1/donors/find-projects`
+
+### Gamification
+
+- `/api/v1/gamification/leaderboard`
+
+### News
+
+- `/api/v1/news/sdg`
+
+### Health and docs
+
+- `/api/health`
+- `/api/docs`
+
+Implementation note:
+
+- The runtime intentionally serves both `/api/v1/...` and `/v1/...` internally so DigitalOcean App Platform path stripping does not break the public API routes.
+
+## Technology Stack and Why Each Choice Was Made
+
+### Frontend stack
+
+| Technology | Why it is used |
+| --- | --- |
+| React 18 | Good fit for multi-view dashboard UX and interactive stateful flows |
+| TypeScript | Reduces UI/data-contract mistakes across several personas and API shapes |
+| Vite | Fast local iteration and simple production build pipeline |
+| React Router | Clean persona-based route structure |
+| Axios | Small, predictable HTTP client for backend integration |
+| Recharts | Fast way to deliver leadership charts without building a visualization layer from scratch |
+| react-force-graph-2d | Handles the networking graph visualization use case directly |
+| Lucide React | Lightweight icon system for a product with many role-specific visual cues |
+
+### Backend stack
+
+| Technology | Why it is used |
+| --- | --- |
+| FastAPI | Typed, async-friendly API framework with built-in docs |
+| SQLAlchemy | Flexible ORM and query layer for analytics and CRUD workloads |
+| asyncpg | Efficient async PostgreSQL driver for runtime requests |
+| psycopg2-binary | Useful for sync workflows and database tooling |
+| Pydantic | Request and response validation |
+| httpx | Async external API calls, especially for news fetching |
+| NetworkX | Graph construction for collaboration analysis |
+| OpenAI | LLM-backed matching, summarization, and narrative support |
+| LangChain / LangGraph | Higher-level orchestration for AI-assisted workflows |
+
+### Infrastructure stack
+
+| Technology | Why it is used |
+| --- | --- |
+| Docker | Consistent local and production packaging |
+| Nginx | Low-overhead static frontend serving with SPA routing support |
+| DigitalOcean App Platform | Simple managed runtime for two-service deployment |
+| DigitalOcean Managed PostgreSQL | Reduces operational overhead while keeping SQL as the core data model |
+| DigitalOcean Container Registry | Stores deployable frontend and backend images |
+
+## Repository Structure
+
+```text
+.
+|-- backend/
+|   |-- app/
+|   |   |-- routers/
+|   |   |-- services/
+|   |   |-- models.py
+|   |   |-- models_networking.py
+|   |   |-- runtime_app.py
+|   |   `-- settings.py
+|   |-- Dockerfile
+|   `-- requirements-runtime.txt
+|-- frontend/
+|   |-- src/
+|   |   |-- components/
+|   |   |-- pages/
+|   |   `-- services/
+|   |-- Dockerfile
+|   `-- frontend.nginx.conf
+|-- infra/
+|   |-- digitalocean/
+|   |   `-- app.yaml
+|   `-- terraform/
+`-- README.md
 ```
 
-### Manual Setup
+## Local Development
 
-#### Backend Setup
+### 1. Backend
 
 ```bash
 cd backend
-
-# 1. Create virtual environment
 python3 -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# 2. Install dependencies
-pip install -r requirements.txt
-pip install sentence-transformers openai
-
-# 3. Set up database
-createdb gies_sustainability
-psql gies_sustainability < database/schema.sql
-
-# 4. Configure environment
-cp .env.example .env
-# Edit .env and add your OPENAI_API_KEY
-
-# 5. Load data
-python scripts/load_data.py ../data.csv
-
-# 6. Generate impact cards (optional)
-python scripts/generate_sdg7_cards.py --limit 10
-
-# 7. Start server
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+source venv/bin/activate
+pip install -r requirements-runtime.txt
 ```
 
-#### Frontend Setup
+Create an `.env` based on [backend/.env.example](/Users/keshavdalmia/Documents/case_competition/backend/.env.example), then run:
+
+```bash
+uvicorn app.runtime_app:app --reload --host 127.0.0.1 --port 8000
+```
+
+### 2. Frontend
 
 ```bash
 cd frontend
-
-# 1. Install dependencies
-npm install
-
-# 2. Start development server
+npm ci
 npm run dev
 ```
 
-### Access the Application
+The Vite dev server expects the backend at `http://localhost:8000` and proxies `/api` traffic there.
 
-- **Frontend**: http://localhost:3000
-- **Backend API**: http://localhost:8000
-- **API Documentation**: http://localhost:8000/docs (Swagger UI)
-- **Alternative Docs**: http://localhost:8000/redoc
+### 3. Production-style containers
 
----
-
-## 🚀 Usage
-
-### 1. Explore the Dashboard
-
-**Homepage**: 
-- View featured impact stories
-- Select your persona (Dean, Donor, Student)
-
-**Donor View**:
-- Browse impact cards filtered by SDG
-- See funding gaps and real-world outcomes
-- Contact advancement office for funding opportunities
-
-**Dean View**:
-- Analyze SDG × Department heatmap
-- Identify strategic gaps and opportunities
-- View momentum indicators and growth trends
-
-**Student View**:
-- Search for faculty mentors by research interest
-- Get AI-powered collaboration recommendations
-- See active projects looking for team members
-
-### 2. Generate Impact Cards
+Backend image:
 
 ```bash
-cd backend
-source venv/bin/activate
-
-# Generate cards for SDG 7 (Clean Energy)
-python scripts/generate_sdg7_cards.py --limit 10
-
-# Generate cards for all SDGs
-python scripts/generate_sdg7_cards.py --all-sdgs
-
-# Test card generation for specific faculty
-python scripts/test_card_generator.py
+docker build -t gies-backend ./backend
 ```
 
-### 3. Run the Demo Pipeline
+Frontend image:
 
 ```bash
-cd backend
-python scripts/demo_pipeline.py
+docker build -t gies-frontend ./frontend
 ```
 
-This demonstrates:
-- Data loading and validation
-- SDG classification
-- Impact matching
-- Card generation
-- Full narrative output
+## Deployment
 
----
+The repo now includes a DigitalOcean App Platform template at [app.yaml](/Users/keshavdalmia/Documents/case_competition/infra/digitalocean/app.yaml).
 
-## 📚 API Documentation
+Deployment shape:
 
-### REST API Endpoints (52 total)
+- Frontend container on App Platform
+- Backend container on App Platform
+- Managed PostgreSQL database
+- `/` routed to frontend
+- `/api` routed to backend
 
-#### Faculty (6 endpoints)
-- `GET /api/v1/faculty` - List all faculty
-- `GET /api/v1/faculty/{id}` - Get faculty with stats
-- `POST /api/v1/faculty` - Create faculty
-- `PATCH /api/v1/faculty/{id}` - Update faculty
-- `DELETE /api/v1/faculty/{id}` - Delete faculty
-- `GET /api/v1/faculty/{id}/publications` - Get faculty publications
+Important deployment detail:
 
-#### Publications (4 endpoints)
-- `GET /api/v1/publications` - List publications (filterable)
-- `GET /api/v1/publications/{id}` - Get single publication
-- `POST /api/v1/publications` - Create publication
-- `GET /api/v1/publications/sdg/{sdg_number}` - Publications by SDG
+- Images must be built for `linux/amd64` before being pushed to DigitalOcean App Platform. Apple Silicon local images will fail with `exec format error` on the platform.
 
-#### Impacts (7 endpoints)
-- `GET /api/v1/impacts` - List all impacts
-- `GET /api/v1/impacts/{id}` - Get single impact
-- `POST /api/v1/impacts` - Create impact
-- `POST /api/v1/impacts/grants` - Create grant
-- `GET /api/v1/impacts/grants` - List grants
-- `POST /api/v1/impacts/patents` - Create patent
-- `POST /api/v1/impacts/match` - Match publication to impacts (ML)
+## Production Notes
 
-#### Impact Cards (6 endpoints)
-- `GET /api/v1/impact-cards` - List impact cards
-- `GET /api/v1/impact-cards/{id}` - Get detailed card
-- `POST /api/v1/impact-cards` - Create card
-- `PATCH /api/v1/impact-cards/{id}` - Update card
-- `POST /api/v1/impact-cards/{id}/publish` - Publish card
-- `DELETE /api/v1/impact-cards/{id}` - Delete card
+Current production behavior:
 
-#### Machine Learning (4 endpoints)
-- `POST /api/v1/ml/classify-sdg` - Classify text for SDG relevance
-- `POST /api/v1/ml/classify-publication/{id}` - Classify existing publication
-- `POST /api/v1/ml/match-impacts` - Match publication to impacts
-- `POST /api/v1/ml/batch-classify` - Batch classify publications
+- Frontend is served by Nginx on port `8080`.
+- Backend is served by Uvicorn on port `8080`.
+- Health endpoint is exposed at `/api/health`.
+- Swagger UI is exposed at `/api/docs`.
 
-#### Evaluation (6 endpoints)
-- `GET /api/v1/evaluation/metrics` - Get evaluation metrics
-- `POST /api/v1/evaluation/metrics` - Store evaluation results
-- `GET /api/v1/evaluation/metrics/latest` - Latest metrics for SDG
-- `POST /api/v1/evaluation/ground-truth` - Add ground truth
-- `GET /api/v1/evaluation/ground-truth` - List ground truth cases
-- `GET /api/v1/evaluation/ground-truth/stats` - Ground truth statistics
+The current deployed environment was validated against:
 
-#### Decision Support (5 endpoints)
-- `GET /api/v1/decision-support/dean` - Dean dashboard data
-- `GET /api/v1/decision-support/donor` - Donor view data
-- `GET /api/v1/decision-support/student` - Student mentor search
-- `GET /api/v1/decision-support/stats` - Overall statistics
-- `GET /api/v1/decision-support/sdg/{number}/summary` - SDG summary
+- homepage response
+- backend health response
+- live `/api/v1/faculty/` data
+- managed database row counts after import
 
-#### Feedback (5 endpoints)
-- `POST /api/v1/feedback` - Submit faculty feedback
-- `GET /api/v1/feedback` - List feedback submissions
-- `GET /api/v1/feedback/{id}` - Get feedback details
-- `PATCH /api/v1/feedback/{id}/resolve` - Resolve feedback
-- `DELETE /api/v1/feedback/{id}` - Delete feedback
+## Known Gaps and Next Steps
 
-For interactive API documentation, visit http://localhost:8000/docs after starting the backend.
+- Wire the impact-card detail page to the live backend detail endpoint.
+- Replace the student mentor mock dataset with API-backed search.
+- Tighten donor matching with richer source data and stronger output validation.
+- Add a clearer distinction between MVP runtime modules and longer-term ingestion/ML modules.
+- Refresh older documentation files that still describe pre-runtime architecture.
 
----
+## License
 
-## 📁 Project Structure
-
-```
-case_competition/
-├── backend/
-│   ├── app/
-│   │   ├── main.py                    # FastAPI application entry
-│   │   ├── database.py                # Database connection
-│   │   ├── models.py                  # SQLAlchemy ORM models (16 tables)
-│   │   ├── schemas.py                 # Pydantic validation schemas
-│   │   ├── routers/                   # API endpoints (9 routers)
-│   │   │   ├── faculty.py
-│   │   │   ├── publications.py
-│   │   │   ├── impacts.py
-│   │   │   ├── impact_cards.py
-│   │   │   ├── evaluation.py
-│   │   │   ├── feedback.py
-│   │   │   ├── decision_support.py
-│   │   │   ├── ml.py
-│   │   │   └── card_generator.py
-│   │   └── services/                  # Business logic
-│   │       ├── ml/
-│   │       │   ├── sdg_classifier.py  # AI-powered SDG classification
-│   │       │   └── impact_matcher.py  # Multi-modal impact matching
-│   │       ├── external/
-│   │       │   ├── nih_client.py      # NIH RePORTER integration
-│   │       │   ├── nsf_client.py      # NSF Awards integration
-│   │       │   └── uspto_client.py    # USPTO PatentsView integration
-│   │       └── impact_card_generator.py  # LLM narrative generation
-│   ├── database/
-│   │   └── schema.sql                 # PostgreSQL schema (16 tables)
-│   ├── scripts/
-│   │   ├── load_data.py               # CSV data import
-│   │   ├── demo_pipeline.py           # End-to-end demo
-│   │   ├── test_card_generator.py     # Test card generation
-│   │   └── generate_sdg7_cards.py     # Batch generate impact cards
-│   ├── requirements.txt
-│   ├── .env.example
-│   └── README.md
-│
-├── frontend/
-│   ├── src/
-│   │   ├── components/
-│   │   │   └── Layout.tsx             # Navigation and layout
-│   │   ├── pages/
-│   │   │   ├── HomePage.tsx           # Landing page
-│   │   │   ├── DonorView.tsx          # Donor impact cards
-│   │   │   ├── DeanView.tsx           # Strategic dashboard
-│   │   │   ├── StudentView.tsx        # Mentor matching
-│   │   │   └── ImpactCardDetail.tsx   # Detailed card view
-│   │   ├── services/
-│   │   │   └── api.ts                 # API client
-│   │   ├── App.tsx
-│   │   ├── main.tsx
-│   │   └── index.css
-│   ├── package.json
-│   ├── vite.config.ts
-│   └── README.md
-│
-├── data.csv                           # Source data (1,500+ publications)
-├── setup_mvp.sh                       # Automated setup script
-├── start_mvp.sh                       # Start both backend and frontend
-├── README.md                          # This file
-├── MVP_COMPLETE.md                    # MVP implementation summary
-├── new_architecture_mvp.md            # Detailed architecture documentation
-└── presentation_script.md             # Demo script for presentations
-```
-
----
-
-## 🤖 AI/ML Pipeline
-
-### 1. SDG Classification Service
-
-**Two-Stage Classification**:
-
-**Stage 1: Sustainability Relevance** (Binary Classification)
-- Uses GPT-4 to determine if research is sustainability-related
-- Prompt: "Is this research relevant to UN SDGs? Yes/No"
-- Considers both direct applications and foundational research
-
-**Stage 2: SDG Goal Identification** (Multi-label Classification)
-- Uses sentence-transformers (`all-mpnet-base-v2`) for semantic similarity
-- Compares publication embeddings against SDG description embeddings
-- Returns top-3 SDG goals with confidence scores
-
-**Performance**: 
-- Precision: 85%+
-- Recall: 80%+
-- F1-Score: 82%+
-
-### 2. Impact Matching Engine
-
-**Multi-Modal Matching Algorithm**:
-
-```python
-final_score = (
-    0.5 * semantic_similarity +      # Embedding cosine similarity
-    0.2 * keyword_overlap +          # SDG and term matching
-    0.15 * temporal_proximity +      # Publication year vs grant dates
-    0.15 * author_match              # Faculty name matching
-)
-```
-
-**Confidence Thresholds**:
-- **High (≥0.85)**: Auto-approved
-- **Medium (0.70-0.84)**: Requires human validation
-- **Low (<0.70)**: Rejected
-
-**Evaluation Metrics**:
-- **Precision@5**: 85%+ (target met)
-- **Recall@5**: 78%
-- **Mean Average Precision**: 0.82
-
-### 3. Impact Card Generator
-
-**LLM-Powered Narrative Generation**:
-
-**Input**:
-- Faculty profile
-- Publications (filtered by SDG)
-- Linked grants, patents, policies
-- Outcome metrics
-
-**Process**:
-1. Extract key outcomes from structured data
-2. Generate 2-3 sentence narrative using GPT-4
-3. Validate factual accuracy against source data
-4. Format as donor-ready one-pager
-
-**Output**:
-- Compelling story connecting research → outcomes → impact
-- Evidence-backed claims with source links
-- Funding gap analysis
-- Next milestones
-
-**Prompt Template**:
-```
-Professor {name} develops {research area} innovation (SDG{sdg}) that leads to 
-{outcome}. Within {timeframe}, this work has {impact metrics} including 
-{jobs/communities/policies}. Next milestone: {future goal}.
-```
-
-### 4. AI Networking Agent (LangGraph)
-
-**Workflow**:
-1. **Skill Extraction**: Parse student query for interests and skills
-2. **Database Search**: Query faculty, students, projects, skills
-3. **Graph Construction**: Build collaboration network
-4. **Match Ranking**: Score potential matches by relevance
-5. **Advice Generation**: Create personalized outreach suggestions
-
-**Technologies**:
-- LangGraph for workflow orchestration
-- GPT-4 for natural language understanding
-- NetworkX for graph analysis
-- Vector search for semantic matching
-
----
-
-## 🎯 MVP Deliverables Status
-
-| Deliverable | Target | Status | Evidence |
-|------------|--------|--------|----------|
-| **Impact Cards** | 10 for SDG7 | ✅ Complete | `generate_sdg7_cards.py` |
-| **Precision@5** | ≥ 0.85 | ✅ Achieved | Evaluation endpoints |
-| **Donor Briefings** | 2 | ✅ Ready | Generated impact cards |
-| **Ground Truth** | 10-20 cases | ✅ Complete | Ground truth API |
-
----
-
-## 🔐 Security & Best Practices
-
-### Backend
-- **SQL Injection Protection**: Parameterized queries via SQLAlchemy
-- **CORS Configuration**: Controlled cross-origin access
-- **Input Validation**: Pydantic schemas for all endpoints
-- **Environment Variables**: Sensitive data in `.env` file
-- **Authentication Ready**: JWT token infrastructure prepared
-
-### Frontend
-- **XSS Protection**: React JSX automatic escaping
-- **HTTPS Ready**: Production deployment configuration
-- **Environment-based Config**: API URLs from environment
-- **No Client-side Secrets**: All sensitive operations server-side
-
-### Data Governance
-- **Faculty Feedback Loop**: Correction mechanism for AI errors
-- **Audit Logs**: All data changes tracked
-- **Data Retention Policies**: Automated purging of old logs
-- **Privacy Controls**: Opt-out options for faculty
-
----
-
-## 📈 Performance Metrics
-
-### Backend
-- **52 API endpoints** fully functional
-- **16 database tables** with proper indexes
-- **<100ms** response time for most queries
-- **Async operations** for concurrent requests
-- **Redis caching** for frequently accessed data
-
-### Frontend
-- **Fast Refresh** with Vite for instant updates
-- **Code splitting** for optimal bundle size
-- **Lazy loading** for route-based components
-- **Responsive design** for all screen sizes
-
-### AI/ML
-- **SDG Classification**: ~2 seconds per publication
-- **Impact Matching**: ~5 seconds for 100 candidates
-- **Card Generation**: ~10 seconds per card (GPT-4)
-- **Batch Processing**: 100+ publications in parallel
-
----
-
-## 🤝 Contributing
-
-We welcome contributions! Please follow these guidelines:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-### Development Guidelines
-- Follow PEP 8 for Python code
-- Use TypeScript for all frontend code
-- Write tests for new features
-- Update documentation as needed
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
----
-
-## 👥 Team
-
-**Gies College of Business, University of Illinois**
-- Analytics Team
-- Center for Professional Responsibility in Business and Society (CPRBS)
-
----
-
-## 📞 Support
-
-For questions, issues, or feature requests:
-- **Documentation**: See `/docs` folder for detailed guides
-- **API Issues**: Check http://localhost:8000/docs for interactive testing
-- **Email**: Contact Gies Analytics Team
-
----
-
-## 🎉 Acknowledgments
-
-- **UN Sustainable Development Goals** for the framework
-- **OpenAI** for GPT-4 API
-- **NIH, NSF, USPTO** for public data APIs
-- **University of Illinois** for Illinois Experts API
-- **Open Source Community** for amazing tools and libraries
-
----
-
-## 🚀 What's Next?
-
-### Planned Features
-- [ ] Real-time collaboration features
-- [ ] Mobile app (iOS/Android)
-- [ ] Advanced analytics dashboard
-- [ ] Integration with more external data sources
-- [ ] Multi-university support
-- [ ] Automated email notifications
-- [ ] Export to PDF/PowerPoint
-
-### Deployment
-- [ ] AWS/GCP/Azure deployment guide
-- [ ] Docker Compose production setup
-- [ ] CI/CD pipeline with GitHub Actions
-- [ ] Monitoring and alerting setup
-
----
-
-**Built with ❤️ for sustainability research impact**
+This repository currently references MIT-style badging in older docs, but the root project should only claim a license once a final license file is added explicitly.

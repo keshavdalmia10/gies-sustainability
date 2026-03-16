@@ -1,45 +1,43 @@
 """
 FastAPI Main Application
 """
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from contextlib import asynccontextmanager
-import os
-from dotenv import load_dotenv
 
-from app.database import init_db, close_db
+from app.database import close_db, init_db, ping_db
 # Import models to ensure they are registered
 from app import models
 from app import models_extended
 from app import models_networking
-from app.routers import faculty, publications, impacts, impact_cards, evaluation, feedback, decision_support, ml, card_generator, extended_data, data_sources, verification, networking, news, analytics, gamification, donors
+from app.routers import faculty, publications, impacts, impact_cards, evaluation, feedback, decision_support, ml, card_generator, extended_data, verification, networking, news, analytics, gamification, donors
+from app.settings import get_settings
 
-load_dotenv()
+settings = get_settings("http://localhost:3000,http://127.0.0.1:3000")
 
 # Lifespan context manager for startup/shutdown
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup
-    await init_db()
+    if settings.auto_init_db:
+        await init_db()
+    else:
+        await ping_db()
     yield
-    # Shutdown
     await close_db()
 
 
 # Create FastAPI app
 app = FastAPI(
-    title=os.getenv("APP_NAME", "Gies Sustainability Impact API"),
-    version=os.getenv("APP_VERSION", "1.0.0"),
+    title=settings.app_name,
+    version=settings.app_version,
     description="API for the Gies College Sustainability Impact Dashboard",
     lifespan=lifespan
 )
 
 # CORS middleware
-default_origins = "http://localhost:3000,http://127.0.0.1:3000"
-origins = [origin.strip() for origin in os.getenv("ALLOWED_ORIGINS", default_origins).split(",") if origin.strip()]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=settings.allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -56,7 +54,6 @@ app.include_router(decision_support.router, prefix="/api/v1/decision-support", t
 app.include_router(ml.router, prefix="/api/v1/ml", tags=["Machine Learning"])
 app.include_router(card_generator.router, prefix="/api/v1/card-generator", tags=["Card Generator"])
 app.include_router(extended_data.router, prefix="/api/v1/extended", tags=["Extended Data"])
-app.include_router(data_sources.router, prefix="/api/v1/data-sources", tags=["Data Sources"])
 app.include_router(verification.router, prefix="/api/v1/verification", tags=["Faculty Verification"])
 app.include_router(networking.router, prefix="/api/v1/networking", tags=["Networking"])
 app.include_router(news.router, prefix="/api/v1/news", tags=["News"])
@@ -69,13 +66,14 @@ app.include_router(donors.router, prefix="/api/v1/donors", tags=["Donors"])
 async def root():
     """Root endpoint"""
     return {
-        "message": "Gies Sustainability Impact API",
-        "version": os.getenv("APP_VERSION", "1.0.0"),
+        "message": settings.app_name,
+        "version": settings.app_version,
         "docs": "/docs"
     }
 
 
 @app.get("/health")
+@app.get("/api/health", include_in_schema=False)
 async def health_check():
     """Health check endpoint"""
-    return {"status": "healthy"}
+    return {"status": "healthy", "environment": settings.app_env}

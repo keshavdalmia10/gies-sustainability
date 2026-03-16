@@ -1,0 +1,42 @@
+name: gies-sustainability
+region: nyc
+services:
+  - name: frontend
+    http_port: 8080
+    instance_count: 1
+    instance_size_slug: basic-xxs
+    image:
+      registry_type: DOCR
+      registry: gies-sustainability
+      repository: app
+      tag: __FRONTEND_IMAGE_TAG__
+    routes:
+      - path: /
+  - name: backend
+    http_port: 8080
+    instance_count: 1
+    instance_size_slug: basic-xxs
+    image:
+      registry_type: DOCR
+      registry: gies-sustainability
+      repository: app
+      tag: __BACKEND_IMAGE_TAG__
+    envs:
+      - key: APP_ENV
+        value: production
+      - key: APP_NAME
+        value: Gies Sustainability Impact API
+      - key: APP_VERSION
+        value: 1.0.0
+      - key: AUTO_INIT_DB
+        value: "false"
+      - key: DATABASE_URL
+        scope: RUN_TIME
+        type: SECRET
+        value: __DATABASE_URL__
+      - key: DATABASE_ASYNC_URL
+        scope: RUN_TIME
+        type: SECRET
+        value: __DATABASE_ASYNC_URL__
+    routes:
+      - path: /api
