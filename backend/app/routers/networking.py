@@ -161,7 +161,15 @@ async def analyze_network(request: schemas_networking.ChatAnalysisRequest, db: A
     
     # Run the graph
     # ainvoke returns the final state
-    final_state = await app.ainvoke(initial_state)
+    try:
+        final_state = await app.ainvoke(initial_state)
+    except Exception as exc:
+        print(f"ERROR: networking analyze fallback due to workflow failure: {exc}")
+        return {
+            "response": "Network Assistant is temporarily running in safe mode. Try specific skills like Python, SQL, or Sustainability.",
+            "suggested_connections": [],
+            "graph_data": {"nodes": [], "edges": []},
+        }
     
     response_text = final_state.get("final_response", "I couldn't generate a response.")
     

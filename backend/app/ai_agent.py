@@ -1,14 +1,17 @@
+import asyncio
 import os
-from typing import List, Dict, Any, TypedDict, Annotated
+import re
+from typing import List, Dict, Any, TypedDict, Annotated, Optional, TYPE_CHECKING
 import operator
-from langchain_openai import ChatOpenAI
 from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
-from langchain_core.prompts import ChatPromptTemplate
 from langgraph.graph import StateGraph, END
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, literal, or_
 from sqlalchemy.orm import selectinload
 from app import models, models_networking
+
+if TYPE_CHECKING:
+    from langchain_openai import ChatOpenAI
 
 # Define State
 class AgentState(TypedDict):
@@ -19,9 +22,110 @@ class AgentState(TypedDict):
     graph_data: Dict[str, Any]
     final_response: str
 
-# LLM Setup
-# Note: This requires OPENAI_API_KEY to be set in environment
-llm = ChatOpenAI(model="gpt-4o", temperature=0)
+KNOWN_SKILLS = [
+    "Python", "React", "Data Analysis", "Machine Learning",
+    "Sustainability", "Project Management", "Public Speaking",
+    "Java", "C++", "SQL", "Figma", "UI/UX Design"
+]
+
+STOP_WORDS = {
+    "who", "what", "where", "when", "why", "how", "and", "the", "for",
+    "with", "about", "into", "from", "that", "this", "these", "those",
+    "know", "knows", "find", "looking", "need", "want", "help", "me",
+    "i", "we", "our", "us", "a", "an", "to", "of", "in", "on", "at",
+    "is", "are", "be", "can", "should", "would", "could", "experts",
+    "expert", "people", "someone", "somebody"
+}
+
+_llm: Optional["ChatOpenAI"] = None
+_llm_unavailable = False
+
+
+def get_llm() -> Optional["ChatOpenAI"]:
+    """Lazy-load LLM so networking remains functional without OpenAI credentials."""
+    global _llm, _llm_unavailable
+
+    if _llm_unavailable:
+        return None
+
+    if _llm is not None:
+        return _llm
+
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        _llm_unavailable = True
+        return None
+
+    model_name = os.getenv("OPENAI_MODEL", "gpt-4o")
+    try:
+        from langchain_openai import ChatOpenAI
+        _llm = ChatOpenAI(model=model_name, temperature=0, api_key=api_key, max_retries=1)
+        return _llm
+    except Exception as exc:
+        print(f"WARN: Failed to initialize ChatOpenAI for networking assistant: {exc}")
+        _llm_unavailable = True
+        return None
+
+
+def _dedupe(items: List[str]) -> List[str]:
+    seen = set()
+    output = []
+    for item in items:
+        key = item.lower()
+        if key in seen:
+            continue
+        seen.add(key)
+        output.append(item)
+    return output
+
+
+def _fallback_extract_skills(query: str) -> List[str]:
+    lowered_query = query.lower()
+
+    direct_matches = [skill for skill in KNOWN_SKILLS if skill.lower() in lowered_query]
+    if direct_matches:
+        return direct_matches
+
+    tokens = re.findall(r"[A-Za-z][A-Za-z0-9+/#.-]{2,}", query)
+    inferred = []
+    for token in tokens:
+        lowered = token.lower()
+        if lowered in STOP_WORDS:
+            continue
+        inferred.append(token.title())
+        if len(inferred) == 5:
+            break
+
+    return inferred or ["Sustainability"]
+
+
+def _fallback_advice(query: str, nodes: List[Dict[str, Any]]) -> str:
+    if not nodes:
+        return (
+            "I couldn't find direct matches yet. Try naming a specific skill "
+            "(for example: Python, SQL, Sustainability, or Project Management)."
+        )
+
+    lines = ["Here are the strongest matches I found:"]
+    for node in nodes[:5]:
+        matched = ", ".join(node.get("matched_skills", [])) or "general profile match"
+        lines.append(f"- {node['label']} ({node['type']}): {matched}")
+    lines.append("Tip: start with one person whose matched skills best fit your request.")
+    return "\n".join(lines)
+
+
+def _parse_skill_response(raw_content: Any) -> List[str]:
+    if not isinstance(raw_content, str):
+        return []
+
+    parsed = []
+    for chunk in raw_content.split(","):
+        value = chunk.strip().strip(".")
+        if not value:
+            continue
+        known = next((skill for skill in KNOWN_SKILLS if skill.lower() == value.lower()), None)
+        parsed.append(known or value)
+    return _dedupe(parsed)
 
 # --- Nodes ---
 
@@ -30,18 +134,16 @@ async def extract_skills(state: AgentState):
     Extracts relevant skills and roles from the user query.
     """
     query = state["query"]
-    
-    # Hardcoded list of skills for MVP context awareness
-    known_skills = [
-        "Python", "React", "Data Analysis", "Machine Learning", 
-        "Sustainability", "Project Management", "Public Speaking",
-        "Java", "C++", "SQL", "Figma", "UI/UX Design"
-    ]
+    fallback_skills = _fallback_extract_skills(query)
+
+    llm = get_llm()
+    if llm is None:
+        return {"extracted_skills": fallback_skills}
     
     system_prompt = f"""You are an expert at analyzing networking requests. 
     Given a user's goal (e.g., "I want to build a mobile app"), identify the key technical and soft skills required.
     
-    The database contains these specific skills: {", ".join(known_skills)}.
+    The database contains these specific skills: {", ".join(KNOWN_SKILLS)}.
     Prioritize these exact skill names if they are relevant.
     
     Return ONLY a comma-separated list of skills.
@@ -53,8 +155,15 @@ async def extract_skills(state: AgentState):
         HumanMessage(content=query)
     ]
     
-    response = await llm.ainvoke(messages)
-    skills = [s.strip() for s in response.content.split(",")]
+    try:
+        response = await asyncio.wait_for(llm.ainvoke(messages), timeout=8)
+        skills = _parse_skill_response(response.content)
+        if not skills:
+            skills = fallback_skills
+    except Exception as exc:
+        print(f"WARN: extract_skills fallback used due to LLM error: {exc}")
+        skills = fallback_skills
+
     print(f"DEBUG: Extracted Skills: {skills}")
     
     return {"extracted_skills": skills}
@@ -191,7 +300,7 @@ async def generate_advice(state: AgentState):
     query = state["query"]
     
     if not nodes:
-        return {"final_response": "I couldn't find anyone with the exact skills for your request. Try broadening your search or adding more specific skills to the database."}
+        return {"final_response": _fallback_advice(query, nodes)}
     
     node_summaries = "\n".join([f"- {n['label']} ({n['type']}): Matches {', '.join(n['matched_skills'])}" for n in nodes[:10]])
     
@@ -213,9 +322,20 @@ async def generate_advice(state: AgentState):
         SystemMessage(content=system_prompt),
         HumanMessage(content=user_content)
     ]
-    
-    response = await llm.ainvoke(messages)
-    return {"final_response": response.content}
+
+    llm = get_llm()
+    if llm is None:
+        return {"final_response": _fallback_advice(query, nodes)}
+
+    try:
+        response = await asyncio.wait_for(llm.ainvoke(messages), timeout=8)
+        content = response.content if isinstance(response.content, str) else ""
+        if not content.strip():
+            raise ValueError("Empty networking advice response")
+        return {"final_response": content}
+    except Exception as exc:
+        print(f"WARN: generate_advice fallback used due to LLM error: {exc}")
+        return {"final_response": _fallback_advice(query, nodes)}
 
 # --- Workflow Construction ---
 
